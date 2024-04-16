@@ -2,44 +2,42 @@ package com.example.diplom.Controllers;
 
 import com.example.diplom.DB;
 import com.example.diplom.Products.Abonement;
+import com.example.diplom.Products.Certificate;
 import com.example.diplom.addLibraries.WindowsActions;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class MainAdminAbonementsController {
+public class MainAdminCertificatesController {
     @FXML
-    private TableView<Abonement> tableViewAbonements;
+    private TableView<Certificate> tableViewCertificates;
 
     @FXML
     void initialize() {
-        loadAbonements();
+        loadCertificates();
     }
 
-    private void loadAbonements() {
+    private void loadCertificates() {
         DB db = DB.getBase();
         try {
-            List<Abonement> abonements = db.getAbonements();
-            tableViewAbonements.getItems().clear();
-            tableViewAbonements.getItems().addAll(abonements);
+            List<Certificate> certificate = db.getCertificates();
+            tableViewCertificates.getItems().clear();
+            tableViewCertificates.getItems().addAll(certificate);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void onAddClick() throws IOException {
-        WindowsActions.openModalWindow("Новый абонемент", "abonementForm.fxml");
+        WindowsActions.openModalWindow("Новый сертификат", "certificateForm.fxml");
         // Загружаем абонементы для обновления
-        loadAbonements();
+        loadCertificates();
     }
 
     public void onSaveToFileClick() {
@@ -53,8 +51,8 @@ public class MainAdminAbonementsController {
 
         try {
             // Преобразуем данные в JSON и записываем их в файл в папке "Загрузки"
-            objectMapper.writeValue(new File(downloadsPath + "abonements.json"), tableViewAbonements.getItems());
-            System.out.println("Данные успешно сохранены в файл abonements.json в папке \"Загрузки\"");
+            objectMapper.writeValue(new File(downloadsPath + "certificates.json"), tableViewCertificates.getItems());
+            System.out.println("Данные успешно сохранены в файл certificates.json в папке \"Загрузки\"");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Ошибка при сохранении данных в файл");

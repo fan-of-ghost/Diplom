@@ -20,7 +20,7 @@ public class MainAdminMenuController {
 
     @FXML
     void moveToCertificates(ActionEvent event) throws IOException {
-        WindowsActions.changeWindow(event,"Сертификаты","mainAdminMenu.fxml");
+        WindowsActions.changeWindow(event,"Сертификаты","mainAdminCertificates.fxml");
     }
 
 }

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.diplom.Controllers.MainAdminCertificatesController">
+
+    <children>
+        <TableView fx:id="tableViewCertificates" layoutY="74.0" prefHeight="526.0" prefWidth="799.0">
+            <columns>
+                <TableColumn fx:id="idCertificate" prefWidth="32.800018310546875" resizable="false" text="№">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="id" />
+                    </cellValueFactory>
+                    <style>
+                        -fx-alignment: CENTER;
+                    </style>
+                </TableColumn>
+
+                <TableColumn fx:id="nominalCertificate" prefWidth="137.60000610351562" resizable="false" text="Номинал, мин">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="nominal" />
+                    </cellValueFactory>
+                    <style>
+                        -fx-alignment: CENTER;
+                    </style>
+                </TableColumn>
+
+                <TableColumn fx:id="dateOfUseCertificate" prefWidth="76.79998779296875" resizable="false" text="Д/a исп">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="dateOfUse" />
+                    </cellValueFactory>
+                    <style>
+                        -fx-alignment: CENTER;
+                    </style>
+                </TableColumn>
+
+                <TableColumn fx:id="balanceCertificate" prefWidth="117.60003662109375" resizable="false" text="Остаток, мин">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="balance" />
+                    </cellValueFactory>
+                    <style>
+                        -fx-alignment: CENTER;
+                    </style>
+                </TableColumn>
+
+                <TableColumn fx:id="dateOfBuyCertificate" prefWidth="111.20001220703125" resizable="false" text="Д/a покупки">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="dateOfBuy" />
+                    </cellValueFactory>
+                    <style>
+                        -fx-alignment: CENTER;
+                    </style>
+                </TableColumn>
+
+                <TableColumn fx:id="dateOfEndCertificate" prefWidth="137.60003662109375" resizable="false" text="Д/a истечения">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="dateOfEnd" />
+                    </cellValueFactory>
+                    <style>
+                        -fx-alignment: CENTER;
+                    </style>
+                </TableColumn>
+
+                <TableColumn fx:id="statusCertificate" prefWidth="103.99993896484375" resizable="false" text="Статус">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="status" />
+                    </cellValueFactory>
+                    <style>
+                        -fx-alignment: CENTER;
+                    </style>
+                </TableColumn>
+
+                <TableColumn fx:id="idClientCertificate" resizable="false" text="№ клиента">
+                    <cellValueFactory>
+                        <PropertyValueFactory property="idClient" />
+                    </cellValueFactory>
+                    <style>
+                        -fx-alignment: CENTER;
+                    </style>
+                </TableColumn>
+
+            </columns>
+        </TableView>
+        <VBox layoutY="1.0" prefHeight="27.0" prefWidth="226.0">
+            <children>
+                <MenuBar prefHeight="26.0" prefWidth="726.0">
+                    <menus>
+                        <Menu mnemonicParsing="false" text="Файл">
+                            <items>
+                                <MenuItem mnemonicParsing="false" onAction="#onSaveToFileClick" text="Сохранить" />
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Редактирование">
+                            <items>
+                                <MenuItem fx:id="addNewCertificate" mnemonicParsing="false" onAction="#onAddClick" text="Добавить" />
+                            </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Help">
+                            <items>
+                                <MenuItem mnemonicParsing="false" text="About" />
+                            </items>
+                        </Menu>
+                    </menus>
+                </MenuBar>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

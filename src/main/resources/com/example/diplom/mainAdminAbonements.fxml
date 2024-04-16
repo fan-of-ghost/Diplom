@@ -13,58 +13,86 @@
    <children>
       <TableView fx:id="tableViewAbonements" layoutY="74.0" prefHeight="526.0" prefWidth="799.0">
         <columns>
-            <TableColumn fx:id="idAbonement" prefWidth="52.800018310546875" resizable="false" text="№">
+            <TableColumn fx:id="idAbonement" prefWidth="32.800018310546875" resizable="false" text="№">
                 <cellValueFactory>
                     <PropertyValueFactory property="id" />
                 </cellValueFactory>
+                <style>
+                    -fx-alignment: CENTER;
+                </style>
             </TableColumn>
 
-            <TableColumn fx:id="nominalAbonement" prefWidth="121.60000610351562" resizable="false" text="Номинал (мин)">
+
+            <TableColumn fx:id="nominalAbonement" prefWidth="92.00003051757812" resizable="false" text="Номинал, мин">
                 <cellValueFactory>
                     <PropertyValueFactory property="nominal" />
                 </cellValueFactory>
+                <style>
+                    -fx-alignment: CENTER;
+                </style>
             </TableColumn>
 
-            <TableColumn fx:id="dateOfUseAbonement" prefWidth="96.0" resizable="false" text="Д/a исп">
+            <TableColumn fx:id="dateOfUseAbonement" prefWidth="85.60003662109375" resizable="false" text="Д/a исп">
                 <cellValueFactory>
                     <PropertyValueFactory property="dateOfUse" />
                 </cellValueFactory>
+                <style>
+                    -fx-alignment: CENTER;
+                </style>
             </TableColumn>
 
-            <TableColumn fx:id="balanceAbonement" prefWidth="98.4000244140625" resizable="false" text="Остаток (мин)">
+            <TableColumn fx:id="balanceAbonement" prefWidth="87.2000732421875" resizable="false" text="Остаток, мин">
                 <cellValueFactory>
                     <PropertyValueFactory property="balance" />
                 </cellValueFactory>
+                <style>
+                    -fx-alignment: CENTER;
+                </style>
             </TableColumn>
 
-            <TableColumn fx:id="dateOfBuyAbonement" prefWidth="85.5999755859375" resizable="false" text="Д/a покупки">
+            <TableColumn fx:id="dateOfBuyAbonement" prefWidth="108.00006103515625" resizable="false" text="Д/a покупки">
                 <cellValueFactory>
                     <PropertyValueFactory property="dateOfBuy" />
                 </cellValueFactory>
+                <style>
+                    -fx-alignment: CENTER;
+                </style>
             </TableColumn>
 
-            <TableColumn fx:id="dateOfEndAbonement" prefWidth="101.60003662109375" resizable="false" text="Д/a истечения">
+            <TableColumn fx:id="dateOfEndAbonement" prefWidth="99.20001220703125" resizable="false" text="Д/a истечения">
                 <cellValueFactory>
                     <PropertyValueFactory property="dateOfEnd" />
                 </cellValueFactory>
+                <style>
+                    -fx-alignment: CENTER;
+                </style>
             </TableColumn>
 
-            <TableColumn fx:id="dateOfResAbonement" prefWidth="102.4000244140625" resizable="false" text="Д/a продления">
+            <TableColumn fx:id="dateOfResAbonement" prefWidth="109.5999755859375" resizable="false" text="Д/a продления">
                 <cellValueFactory>
                     <PropertyValueFactory property="dateOfRes" />
                 </cellValueFactory>
+                <style>
+                    -fx-alignment: CENTER;
+                </style>
             </TableColumn>
 
-            <TableColumn fx:id="statusAbonement" prefWidth="49.60009765625" resizable="false" text="Статус">
+            <TableColumn fx:id="statusAbonement" prefWidth="98.4000244140625" resizable="false" text="Статус">
                 <cellValueFactory>
                     <PropertyValueFactory property="status" />
                 </cellValueFactory>
+                <style>
+                    -fx-alignment: CENTER;
+                </style>
             </TableColumn>
 
             <TableColumn fx:id="idClientAbonement" prefWidth="85.60002441406255" resizable="false" text="№ клиента">
                 <cellValueFactory>
                     <PropertyValueFactory property="idClient" />
                 </cellValueFactory>
+                <style>
+                    -fx-alignment: CENTER;
+                </style>
             </TableColumn>
 
         </columns>
@@ -75,7 +103,7 @@
               <menus>
                 <Menu mnemonicParsing="false" text="Файл">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Сохранить" onAction="#onSaveToFileClick"/>
+                    <MenuItem mnemonicParsing="false" onAction="#onSaveToFileClick" text="Сохранить" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Редактирование">

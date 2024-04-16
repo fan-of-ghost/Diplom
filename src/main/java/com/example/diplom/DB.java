@@ -1,9 +1,9 @@
 package com.example.diplom;
 
 import com.example.diplom.Products.Abonement;
+import com.example.diplom.Products.Certificate;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -55,7 +55,7 @@ public class DB {
 
     public List<Abonement> getAbonements() {
         List<Abonement> abonements = new ArrayList<>();
-        String sql = "SELECT * FROM `Абонементы`";
+        String sql = "SELECT ab.*, st.название AS статус FROM `Абонементы` ab INNER JOIN `Статусы` st ON ab.id_статуса = st.id_статуса";
         try (Connection connection = getDbConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
@@ -69,7 +69,7 @@ public class DB {
                 abonement.setDateOfBuy(resultSet.getDate("дата_покупки"));
                 abonement.setDateOfEnd(resultSet.getDate("дата_истечения"));
                 abonement.setDateOfRes(resultSet.getDate("дата_продления"));
-                abonement.setStatus(resultSet.getString("id_статуса"));
+                abonement.setStatus(resultSet.getString("статус"));
                 abonement.setIdClient(resultSet.getInt("id_клиента"));
                 abonements.add(abonement);
             }
@@ -113,8 +113,6 @@ public class DB {
             statement.setInt(5, status);
             statement.setInt(6, idClient);
 
-
-
             // Выполнение запроса
             statement.executeUpdate();
         } catch (SQLException | ClassNotFoundException e) {
@@ -152,4 +150,54 @@ public class DB {
         return 0; // Если не найдено, возвращаем 0 или обрабатываем по-другому
     }
 
+    public List<Certificate> getCertificates() {
+        List<Certificate> certificates = new ArrayList<>();
+        String sql = "SELECT ser.*, st.название AS статус FROM `Сертификаты` ser INNER JOIN `Статусы` st ON ser.id_статуса = st.id_статуса";
+        try (Connection connection = getDbConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                // Создаем объект абонемента и заполняем его данными из результата запроса
+                Certificate certificate = new Certificate();
+                certificate.setId(resultSet.getInt("id_сертификата"));
+                certificate.setNominal(resultSet.getInt("номинал_в_минутах"));
+                certificate.setDateOfUse(resultSet.getDate("дата_использования"));
+                certificate.setBalance(resultSet.getInt("остаток_в_минутах"));
+                certificate.setDateOfBuy(resultSet.getDate("дата_покупки"));
+                certificate.setDateOfEnd(resultSet.getDate("дата_истечения"));
+                certificate.setStatus(resultSet.getString("статус"));
+                certificate.setIdClient(resultSet.getInt("id_клиента"));
+                certificates.add(certificate);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return certificates;
+    }
+
+    public void addCertificate(int nominal, int status, int idClient, Date dateOfBuy) {
+        String sql = "INSERT INTO `Сертификаты` (номинал_в_минутах, дата_покупки, дата_истечения, остаток_в_минутах, id_статуса, id_клиента) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            // Установка параметров запроса
+            statement.setInt(1, nominal);
+            statement.setDate(2, dateOfBuy);
+
+            // Расчет даты истечения: добавляем к дате покупки 1 год
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(dateOfBuy);
+            calendar.add(Calendar.YEAR, 1);
+            java.sql.Date dateOfEnd = new java.sql.Date(calendar.getTimeInMillis());
+
+            statement.setDate(3, dateOfEnd);
+            statement.setInt(4, nominal); // Номинал также используется для остатка
+            statement.setInt(5, status);
+            statement.setInt(6, idClient);
+
+            // Выполнение запроса
+            statement.executeUpdate();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }
