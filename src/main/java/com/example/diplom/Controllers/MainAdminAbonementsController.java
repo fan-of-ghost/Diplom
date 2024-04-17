@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 public class MainAdminAbonementsController {
@@ -46,15 +47,27 @@ public class MainAdminAbonementsController {
         // Получаем путь к папке "Загрузки" для текущего пользователя
         String downloadsPath = System.getProperty("user.home") + "/Downloads/";
 
-        // Создаем объект ObjectMapper для преобразования данных в JSON
-        ObjectMapper objectMapper = new ObjectMapper();
-        // Устанавливаем настройку для отступов (indent) для лучшей читаемости
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        try (PrintWriter writer = new PrintWriter(new File(downloadsPath + "abonements.csv"))) {
+            // Записываем заголовки столбцов
+            writer.println("ID,Номинал,Дата использования,Остаток,Дата покупки,Дата истечения,Дата продления,Статус,Номер клиента");
 
-        try {
-            // Преобразуем данные в JSON и записываем их в файл в папке "Загрузки"
-            objectMapper.writeValue(new File(downloadsPath + "abonements.json"), tableViewAbonements.getItems());
-            System.out.println("Данные успешно сохранены в файл abonements.json в папке \"Загрузки\"");
+            // Получаем данные из TableView
+            ObservableList<Abonement> data = tableViewAbonements.getItems();
+
+            // Проходим по каждому абонементу и записываем его данные в CSV
+            for (Abonement abonement : data) {
+                writer.println(abonement.getId() + "," +
+                        abonement.getNominal() + "," +
+                        abonement.getDateOfUse() + "," +
+                        abonement.getBalance() + "," +
+                        abonement.getDateOfBuy() + "," +
+                        abonement.getDateOfEnd() + "," +
+                        abonement.getDateOfRes() + "," +
+                        abonement.getStatus() + "," +
+                        abonement.getIdClient());
+            }
+
+            System.out.println("Данные успешно сохранены в файл abonements.csv в папке \"Загрузки\"");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Ошибка при сохранении данных в файл");
