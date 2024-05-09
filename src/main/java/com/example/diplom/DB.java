@@ -2,6 +2,7 @@ package com.example.diplom;
 
 import com.example.diplom.Products.Abonement;
 import com.example.diplom.Products.Certificate;
+import com.example.diplom.Products.Client;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -200,4 +201,30 @@ public class DB {
             e.printStackTrace();
         }
     }
+
+    public Client getClientByAbonementId(int abonementId) {
+        String sql = "SELECT c.`id_клиента`, c.`фамилия`, c.`имя`, c.`отчество`, c.`контактный_телефон`, c.`адрес_электронной_почты` " +
+                "FROM `Клиенты` c " +
+                "JOIN `Абонементы` a ON c.`id_клиента` = a.`id_клиента` " +
+                "WHERE a.`id_абонемента` = ?";
+        try (PreparedStatement statement = getDbConnection().prepareStatement(sql)) {
+            statement.setInt(1, abonementId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int id = resultSet.getInt("id_клиента");
+                String surname = resultSet.getString("фамилия");
+                String name = resultSet.getString("имя");
+                String patronymic = resultSet.getString("отчество");
+                String phoneNumber = resultSet.getString("контактный_телефон");
+                String email = resultSet.getString("адрес_электронной_почты");
+
+                return new Client(id, surname, name, patronymic, phoneNumber, email);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
