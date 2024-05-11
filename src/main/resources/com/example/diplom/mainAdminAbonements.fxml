@@ -103,7 +103,8 @@
               <menus>
                 <Menu mnemonicParsing="false" text="Файл">
                   <items>
-                    <MenuItem mnemonicParsing="false" onAction="#onSaveToFileClick" text="Сохранить" />
+                    <MenuItem mnemonicParsing="false" onAction="#onSaveToFileClick" text="Сохранить/экспорт" />
+                        <MenuItem mnemonicParsing="false" onAction="#onLoadToFileClick" text="Загрузить/импорт" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Редактирование">

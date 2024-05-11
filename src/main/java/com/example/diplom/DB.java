@@ -5,9 +5,12 @@ import com.example.diplom.Products.Certificate;
 import com.example.diplom.Products.Client;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import static java.lang.String.valueOf;
 
 public class DB {
     private DB() {}
@@ -89,6 +92,22 @@ public class DB {
             statement.setString(3, patronymic);
             statement.setString(4, phoneNumber);
             statement.setString(5, email);
+            statement.executeUpdate();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addNewClient(int id, String surname, String name, String patronymic, String phoneNumber, String email) {
+        String sql = "INSERT INTO `Клиенты` (id_клиента, фамилия, имя, отчество, контактный_телефон, адрес_электронной_почты) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            statement.setString(2, surname);
+            statement.setString(3, name);
+            statement.setString(4, patronymic);
+            statement.setString(5, phoneNumber);
+            statement.setString(6, email);
             statement.executeUpdate();
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -226,5 +245,138 @@ public class DB {
         }
         return null;
     }
+
+    public boolean clientExists(int id) {
+        String query = "SELECT COUNT(*) FROM Клиенты WHERE id_клиента = ?";
+        try (Connection conn = getDbConnection();
+             PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace(); // Обработка ошибок (логирование и т.д.)
+        }
+        return false;
+    }
+
+    public boolean certificateExists(int id) {
+        String query = "SELECT COUNT(*) FROM Сертификаты WHERE id_сертификата = ?";
+        try (Connection conn = getDbConnection();
+             PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace(); // Обработка ошибок (логирование и т.д.)
+        }
+        return false;
+    }
+
+    public boolean abonementExists(int id) {
+        String query = "SELECT COUNT(*) FROM Абонементы WHERE id_абонемента = ?";
+        try (Connection conn = getDbConnection();
+             PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace(); // Обработка ошибок (логирование и т.д.)
+        }
+        return false;
+    }
+
+    public boolean raceExists(int id) {
+        String query = "SELECT COUNT(*) FROM Заезды WHERE id_заезда = ?";
+        try (Connection conn = getDbConnection();
+             PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int count = resultSet.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace(); // Обработка ошибок (логирование и т.д.)
+        }
+        return false;
+    }
+
+    public void addNewCertificate(int id, int nominal, LocalDate dateOfUse, int balance, LocalDate dateOfEnd, LocalDate dateOfBuy, int idStatus, int idClient) {
+        String sql = "INSERT INTO `Сертификаты` (id_сертификата, номинал_в_минутах, дата_использования, остаток_в_минутах, дата_истечения, дата_покупки, id_статуса, id_клиента) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            statement.setInt(2, nominal);
+            statement.setDate(3, Date.valueOf(dateOfUse));
+            statement.setInt(4, balance);
+            statement.setDate(5, Date.valueOf(dateOfEnd));
+            statement.setDate(6, Date.valueOf(dateOfBuy));
+            statement.setInt(7, idStatus);
+            statement.setInt(8, idClient);
+            statement.executeUpdate();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addNewAbonement(int id, int nominal, LocalDate dateOfUse, int balance, LocalDate dateOfEnd, LocalDate dateOfBuy, LocalDate dateOfRes, int idStatus, int idClient) {
+        String sql = "INSERT INTO `Абонементы` (id_абонемента, номинал_в_минутах, дата_использования, остаток_в_минутах, дата_истечения, дата_покупки, дата_продления, id_статуса, id_клиента) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            statement.setInt(2, nominal);
+            statement.setDate(3, Date.valueOf(dateOfUse));
+            statement.setInt(4, balance);
+            statement.setDate(5, Date.valueOf(dateOfEnd));
+            statement.setDate(6, Date.valueOf(dateOfBuy));
+            statement.setDate(7, Date.valueOf(dateOfRes));
+            statement.setInt(8, idStatus);
+            statement.setInt(9, idClient);
+            statement.executeUpdate();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addNewRace(int id, LocalDate date, int spentTime, Integer idCertificate, Integer idAbonement) {
+        String sql = "INSERT INTO `Заезды` (id_заезда, дата, затраченное_время_в_минутах, id_сертификата, id_абонемента) VALUES (?, ?, ?, ?, ?)";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            statement.setDate(2, Date.valueOf(date));
+            statement.setInt(3, spentTime);
+            if (idCertificate != null) {
+                statement.setInt(4, idCertificate);
+            } else {
+                statement.setNull(4, Types.INTEGER);
+            }
+            if (idAbonement != null) {
+                statement.setInt(5, idAbonement);
+            } else {
+                statement.setNull(5, Types.INTEGER);
+            }
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Ошибка при добавлении нового заезда в базу данных", e);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Ошибка при подключении к базе данных", e);
+        }
+    }
+
 
 }

@@ -143,4 +143,7 @@ public class MainAdminAbonementsController {
         });
     }
 
+    public void onLoadToFileClick(ActionEvent actionEvent) throws IOException {
+        WindowsActions.openModalWindow("Импорт таблиц из csv", "importTables.fxml");
+    }
 }
