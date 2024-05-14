@@ -173,7 +173,6 @@ public class MainAdminAbonementsController {
         });
     }
 
-
     public void onLoadToFileClick() throws IOException {
         WindowsActions.openModalWindow("Импорт таблиц из csv", "importTables.fxml");
     }
@@ -182,4 +181,7 @@ public class MainAdminAbonementsController {
         WindowsActions.openModalWindow("Архив просроченных абонементов", "archiveToAbonements.fxml");
     }
 
+    public void clientForPeriod() throws IOException {
+        WindowsActions.openModalWindow("Сотрудники за период", "exportClientsForPeriodAbonement.fxml");
+    }
 }

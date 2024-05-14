@@ -106,6 +106,7 @@
                     <MenuItem mnemonicParsing="false" onAction="#onSaveToFileClick" text="Сохранить/экспорт" />
                         <MenuItem mnemonicParsing="false" onAction="#onLoadToFileClick" text="Загрузить/импорт" />
                         <MenuItem mnemonicParsing="false" onAction="#openModalWindowArchiveToAbonements" text="Архив" />
+                        <MenuItem mnemonicParsing="false" onAction="#clientForPeriod" text="Клиенты за период" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Редактирование">

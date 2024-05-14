@@ -5,10 +5,9 @@ import com.example.diplom.Products.Certificate;
 import com.example.diplom.Products.Client;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.String.valueOf;
 
@@ -442,6 +441,34 @@ public class DB {
             e.printStackTrace();
         }
         return ""; // Если не найдено, возвращаем пустоту
+    }
+
+    public Set<Client> getClientsForPeriod(LocalDate startDate, LocalDate endDate) {
+        Set<Client> clients = new HashSet<>();
+        String sql = "SELECT DISTINCT c.* " +
+                "FROM `Абонементы` a " +
+                "JOIN `Клиенты` c ON a.id_клиента = c.id_клиента " +
+                "WHERE a.дата_использования BETWEEN ? AND ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setDate(1, Date.valueOf(startDate));
+            statement.setDate(2, Date.valueOf(endDate));
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id_клиента");
+                String lastName = resultSet.getString("фамилия");
+                String firstName = resultSet.getString("имя");
+                String middleName = resultSet.getString("отчество");
+                String phone = resultSet.getString("контактный_телефон");
+                String email = resultSet.getString("адрес_электронной_почты");
+
+                // Создание объекта клиента и добавление его в множество
+                clients.add(new Client(id, lastName, firstName, middleName, phone, email));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return clients;
     }
 
 }
