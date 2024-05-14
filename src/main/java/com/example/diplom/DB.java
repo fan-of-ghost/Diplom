@@ -58,8 +58,41 @@ public class DB {
     }
 
     public List<Abonement> getAbonements() {
+        List<Abonement> activeAbonements = new ArrayList<>();
+        String sql = "SELECT ab.*, st.название AS статус " +
+                "FROM `Абонементы` ab " +
+                "INNER JOIN `Статусы` st ON ab.id_статуса = st.id_статуса " +
+                "WHERE ab.архив = 'не в архиве'";
+        try (Connection connection = getDbConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                // Создаем объект абонемента и заполняем его данными из результата запроса
+                Abonement abonement = new Abonement();
+                abonement.setId(resultSet.getInt("id_абонемента"));
+                abonement.setNominal(resultSet.getInt("номинал_в_минутах"));
+                abonement.setDateOfUse(resultSet.getDate("дата_использования"));
+                abonement.setBalance(resultSet.getInt("остаток_в_минутах"));
+                abonement.setDateOfBuy(resultSet.getDate("дата_покупки"));
+                abonement.setDateOfEnd(resultSet.getDate("дата_истечения"));
+                abonement.setDateOfRes(resultSet.getDate("дата_продления"));
+                abonement.setStatus(resultSet.getString("статус"));
+                abonement.setIdClient(resultSet.getInt("id_клиента"));
+                activeAbonements.add(abonement);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return activeAbonements;
+    }
+
+
+    public List<Abonement> getInactiveAbonements() {
         List<Abonement> abonements = new ArrayList<>();
-        String sql = "SELECT ab.*, st.название AS статус FROM `Абонементы` ab INNER JOIN `Статусы` st ON ab.id_статуса = st.id_статуса";
+        String sql = "SELECT ab.*, st.название AS статус " +
+                "FROM `Абонементы` ab " +
+                "INNER JOIN `Статусы` st ON ab.id_статуса = st.id_статуса " +
+                "WHERE ab.архив = 'в архиве'";
         try (Connection connection = getDbConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
@@ -81,6 +114,24 @@ public class DB {
             e.printStackTrace();
         }
         return abonements;
+    }
+
+    public void archiveAbonement(int abonementId) throws SQLException, ClassNotFoundException {
+        String sql = "UPDATE `Абонементы` SET архив = 'в архиве' WHERE id_абонемента = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, abonementId);
+            statement.executeUpdate();
+        }
+    }
+
+    public void unArchiveAbonement(int abonementId) throws SQLException, ClassNotFoundException {
+        String sql = "UPDATE `Абонементы` SET архив = 'не в архиве' WHERE id_абонемента = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, abonementId);
+            statement.executeUpdate();
+        }
     }
 
     public void addNewClient(String surname, String name, String patronymic, String phoneNumber, String email) {
@@ -378,5 +429,19 @@ public class DB {
         }
     }
 
+    public String checkStateByIdAbonement(int id) {
+        String sql = "SELECT `состояние` FROM `Абонементы` WHERE `id_абонемента` = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("состояние");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return ""; // Если не найдено, возвращаем пустоту
+    }
 
 }

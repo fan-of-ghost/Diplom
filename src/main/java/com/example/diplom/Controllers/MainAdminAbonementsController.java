@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class MainAdminAbonementsController {
         setupContextMenu();
     }
 
+    @FXML
     private void loadAbonements() {
         DB db = DB.getBase();
         try {
@@ -116,12 +118,14 @@ public class MainAdminAbonementsController {
 
     private void setupContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
-
         MenuItem editMenuItem = new MenuItem("Посмотреть клиента");
+        MenuItem archiveMenuItem = new MenuItem("Архивировать абонемент");
+
+        // Добавляем обработчики действий для каждого пункта меню
+
         editMenuItem.setOnAction(event -> {
             Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
             if (selectedAbonement != null) {
-                // Действия при выборе пункта "Редактировать"
                 try {
                     DataExchanger dataExchanger = DataExchanger.getInstance();
                     dataExchanger.setId(selectedAbonement.getId());
@@ -133,17 +137,49 @@ public class MainAdminAbonementsController {
             }
         });
 
-        contextMenu.getItems().addAll(editMenuItem);
+        archiveMenuItem.setOnAction(event -> {
+            Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
+            if (selectedAbonement != null) {
+                try {
+                    DB db = DB.getBase();
+                    db.archiveAbonement(selectedAbonement.getId());
+                    System.out.println("В архив отправился абонемент с id " + selectedAbonement.getId());
+                    tableViewAbonements.getItems().remove(selectedAbonement);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
-        // Установка обработчика для открытия контекстного меню при щелчке правой кнопкой мыши
+        // Добавляем пункты меню
+        contextMenu.getItems().addAll(editMenuItem, archiveMenuItem);
+
+        // Устанавливаем обработчик для открытия контекстного меню
         tableViewAbonements.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
+                // Проверяем, удовлетворяет ли выбранный абонемент условию для отображения пункта "Архивировать абонемент"
+                Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
+                if (selectedAbonement != null) {
+                    try {
+                        DB db = DB.getBase();
+                        boolean isInactive = db.checkStateByIdAbonement(selectedAbonement.getId()).equals("disactive");
+                        archiveMenuItem.setVisible(isInactive); // Устанавливаем видимость пункта меню в зависимости от результата проверки
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 contextMenu.show(tableViewAbonements, event.getScreenX(), event.getScreenY());
             }
         });
     }
 
-    public void onLoadToFileClick(ActionEvent actionEvent) throws IOException {
+
+    public void onLoadToFileClick() throws IOException {
         WindowsActions.openModalWindow("Импорт таблиц из csv", "importTables.fxml");
     }
+
+    public void openModalWindowArchiveToAbonements() throws IOException {
+        WindowsActions.openModalWindow("Архив просроченных абонементов", "archiveToAbonements.fxml");
+    }
+
 }

@@ -105,11 +105,13 @@
                   <items>
                     <MenuItem mnemonicParsing="false" onAction="#onSaveToFileClick" text="Сохранить/экспорт" />
                         <MenuItem mnemonicParsing="false" onAction="#onLoadToFileClick" text="Загрузить/импорт" />
+                        <MenuItem mnemonicParsing="false" onAction="#openModalWindowArchiveToAbonements" text="Архив" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Редактирование">
                   <items>
                     <MenuItem fx:id="addNewAbonement" mnemonicParsing="false" onAction="#onAddClick" text="Добавить" />
+                        <MenuItem mnemonicParsing="false" onAction="#loadAbonements" text="Обновить таблицу" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">

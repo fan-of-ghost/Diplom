@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="718.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.diplom.Controllers.ArchiveToAbonementsController">
+   <children>
+      <TableView fx:id="tableViewAbonements" prefHeight="400.0" prefWidth="810.0">
+         <columns>
+            <TableColumn fx:id="idAbonement" prefWidth="32.800018310546875" resizable="false" style="&#10;                    -fx-alignment: CENTER;&#10;                " text="№">
+               <cellValueFactory>
+                  <PropertyValueFactory property="id" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="nominalAbonement" prefWidth="92.00003051757812" resizable="false" style="&#10;                    -fx-alignment: CENTER;&#10;                " text="Номинал, мин">
+               <cellValueFactory>
+                  <PropertyValueFactory property="nominal" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="dateOfUseAbonement" prefWidth="85.60003662109375" resizable="false" style="&#10;                    -fx-alignment: CENTER;&#10;                " text="Д/a исп">
+               <cellValueFactory>
+                  <PropertyValueFactory property="dateOfUse" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="balanceAbonement" prefWidth="87.2000732421875" resizable="false" style="&#10;                    -fx-alignment: CENTER;&#10;                " text="Остаток, мин">
+               <cellValueFactory>
+                  <PropertyValueFactory property="balance" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="dateOfBuyAbonement" prefWidth="108.00006103515625" resizable="false" style="&#10;                    -fx-alignment: CENTER;&#10;                " text="Д/a покупки">
+               <cellValueFactory>
+                  <PropertyValueFactory property="dateOfBuy" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="dateOfEndAbonement" prefWidth="99.20001220703125" resizable="false" style="&#10;                    -fx-alignment: CENTER;&#10;                " text="Д/a истечения">
+               <cellValueFactory>
+                  <PropertyValueFactory property="dateOfEnd" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="dateOfResAbonement" prefWidth="109.5999755859375" resizable="false" style="&#10;                    -fx-alignment: CENTER;&#10;                " text="Д/a продления">
+               <cellValueFactory>
+                  <PropertyValueFactory property="dateOfRes" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="statusAbonement" prefWidth="98.4000244140625" resizable="false" style="&#10;                    -fx-alignment: CENTER;&#10;                " text="Статус">
+               <cellValueFactory>
+                  <PropertyValueFactory property="status" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="idClientAbonement" prefWidth="85.60002441406255" resizable="false" style="&#10;                    -fx-alignment: CENTER;&#10;                " text="№ клиента">
+               <cellValueFactory>
+                  <PropertyValueFactory property="idClient" />
+               </cellValueFactory>
+            </TableColumn>
+         </columns>
+      </TableView>
+   </children>
+</AnchorPane>
