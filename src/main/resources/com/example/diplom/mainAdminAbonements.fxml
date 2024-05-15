@@ -97,7 +97,7 @@
 
         </columns>
       </TableView>
-      <VBox layoutY="1.0" prefHeight="27.0" prefWidth="226.0">
+      <VBox layoutY="1.0" prefHeight="27.0" prefWidth="230.0">
          <children>
             <MenuBar prefHeight="26.0" prefWidth="726.0">
               <menus>
@@ -115,9 +115,10 @@
                         <MenuItem mnemonicParsing="false" onAction="#loadAbonements" text="Обновить таблицу" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Help">
+                <Menu mnemonicParsing="false" text="График">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
+                    <MenuItem mnemonicParsing="false" text="Расписание" />
+                        <MenuItem mnemonicParsing="false" onAction="#openReservation" text="Бронирование" />
                   </items>
                 </Menu>
               </menus>

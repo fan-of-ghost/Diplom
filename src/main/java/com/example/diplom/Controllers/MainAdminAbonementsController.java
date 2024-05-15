@@ -184,4 +184,8 @@ public class MainAdminAbonementsController {
     public void clientForPeriod() throws IOException {
         WindowsActions.openModalWindow("Сотрудники за период", "exportClientsForPeriodAbonement.fxml");
     }
+
+    public void openReservation() throws IOException {
+        WindowsActions.openModalWindow("Бронирование заезда по абонементу", "reservationForAbonement.fxml");
+    }
 }

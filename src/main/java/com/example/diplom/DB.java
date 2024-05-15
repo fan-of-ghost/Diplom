@@ -471,4 +471,43 @@ public class DB {
         return clients;
     }
 
+    public int getBalanceAbonement(int id) {
+        String sql = "SELECT номинал_в_минутах FROM Абонементы WHERE id_абонемента = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("номинал_в_минутах");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0; // Если не найдено, возвращаем 0 или обрабатываем по-другому
+    }
+
+    public void insertReservation(int abonementId, LocalDate reservationDate) throws SQLException {
+        String sql = "INSERT INTO График_абонементов (id_абонемента, дата_использования) VALUES (?, ?)";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, abonementId);
+            statement.setDate(2, java.sql.Date.valueOf(reservationDate));
+            statement.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("MySQL JDBC Driver не найден", e);
+        }
+    }
+
+    public void updateAbonement(int abonementId, int minutesUsed) throws SQLException {
+        String sql = "UPDATE Абонементы SET остаток_в_минутах = остаток_в_минутах - ? WHERE id_абонемента = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, minutesUsed);
+            statement.setInt(2, abonementId);
+            statement.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("MySQL JDBC Driver не найден", e);
+        }
+    }
+
 }
