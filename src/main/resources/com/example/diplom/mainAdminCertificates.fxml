@@ -95,16 +95,21 @@
                         <Menu mnemonicParsing="false" text="Файл">
                             <items>
                                 <MenuItem mnemonicParsing="false" onAction="#onSaveToFileClick" text="Сохранить" />
+                                <MenuItem mnemonicParsing="false" onAction="#onLoadToFileClick" text="Загрузить/импорт" />
+                                <MenuItem mnemonicParsing="false" onAction="#openModalWindowArchiveToCertificates" text="Архив" />
+                        <MenuItem mnemonicParsing="false" onAction="#clientForPeriod" text="Клиенты за период" />
                             </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="Редактирование">
                             <items>
                                 <MenuItem fx:id="addNewCertificate" mnemonicParsing="false" onAction="#onAddClick" text="Добавить" />
+                        <MenuItem mnemonicParsing="false" onAction="#loadCertificates" text="Обновить таблицу" />
                             </items>
                         </Menu>
-                        <Menu mnemonicParsing="false" text="Help">
+                        <Menu mnemonicParsing="false" text="График">
                             <items>
-                                <MenuItem mnemonicParsing="false" text="About" />
+                                <MenuItem mnemonicParsing="false" text="Расписание" />
+                        <MenuItem mnemonicParsing="false" onAction="#openReservation" text="Бронирование" />
                             </items>
                         </Menu>
                     </menus>

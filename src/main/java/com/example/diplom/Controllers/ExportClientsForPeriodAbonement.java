@@ -2,19 +2,17 @@ package com.example.diplom.Controllers;
 
 import com.example.diplom.DB;
 import com.example.diplom.Products.Client;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Set;
 
-public class ExportClientsForPeriod {
+public class ExportClientsForPeriodAbonement {
     @FXML
     private Button exportToCSVButton;
     @FXML
@@ -31,7 +29,7 @@ public class ExportClientsForPeriod {
         String downloadsPath = System.getProperty("user.home") + "/Downloads/";
 
         // Определяем базовое имя файла и начальное значение счетчика инкремента
-        String baseFileName = "clientsForPeriod";
+        String baseFileName = "clientsForPeriodAbonement";
         int incrementCounter = 1;
 
         // Генерируем уникальное имя файла
@@ -48,7 +46,7 @@ public class ExportClientsForPeriod {
             writer.println("ID,Фамилия,Имя,Отчество,Контактный телефон,Адрес электронной почты");
 
             // Получаем клиентов за выбранный период
-            Set<Client> clients = DB.getBase().getClientsForPeriod(startDate, endDate);
+            Set<Client> clients = DB.getBase().getClientsForPeriodAbonement(startDate, endDate);
 
             // Проходим по каждому клиенту и записываем его данные в CSV
             for (Client client : clients) {
@@ -66,5 +64,4 @@ public class ExportClientsForPeriod {
             System.out.println("Ошибка при сохранении данных в файл");
         }
     }
-
 }

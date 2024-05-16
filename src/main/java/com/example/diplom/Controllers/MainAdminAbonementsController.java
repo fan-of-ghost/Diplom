@@ -129,7 +129,7 @@ public class MainAdminAbonementsController {
                 try {
                     DataExchanger dataExchanger = DataExchanger.getInstance();
                     dataExchanger.setId(selectedAbonement.getId());
-                    WindowsActions.openWindow("Информация о клиенте", "clientInfo.fxml");
+                    WindowsActions.openWindow("Информация о клиенте", "clientInfoAbonements.fxml");
                     System.out.println(selectedAbonement.getId());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -187,5 +187,9 @@ public class MainAdminAbonementsController {
 
     public void openReservation() throws IOException {
         WindowsActions.openModalWindow("Бронирование заезда по абонементу", "reservationForAbonement.fxml");
+    }
+
+    public void openSchedule() throws IOException {
+        WindowsActions.openModalWindow("Расписание абонементов", "scheduleAbonements.fxml");
     }
 }

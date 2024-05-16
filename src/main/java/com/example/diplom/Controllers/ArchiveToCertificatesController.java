@@ -2,6 +2,7 @@ package com.example.diplom.Controllers;
 
 import com.example.diplom.DB;
 import com.example.diplom.Products.Abonement;
+import com.example.diplom.Products.Certificate;
 import com.example.diplom.addLibraries.DataExchanger;
 import com.example.diplom.addLibraries.WindowsActions;
 import javafx.fxml.FXML;
@@ -15,9 +16,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class ArchiveToAbonementsController {
+public class ArchiveToCertificatesController {
     @FXML
-    private TableView<Abonement> tableViewAbonements;
+    private TableView<Certificate> tableViewCertificates;
     @FXML
     void initialize() {
         loadAbonements();
@@ -27,9 +28,9 @@ public class ArchiveToAbonementsController {
     private void loadAbonements() {
         DB db = DB.getBase();
         try {
-            List<Abonement> abonements = db.getInactiveAbonements();
-            tableViewAbonements.getItems().clear();
-            tableViewAbonements.getItems().addAll(abonements);
+            List<Certificate> certificates = db.getInactiveCertificates();
+            tableViewCertificates.getItems().clear();
+            tableViewCertificates.getItems().addAll(certificates);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -40,29 +41,29 @@ public class ArchiveToAbonementsController {
 
         MenuItem editMenuItem = new MenuItem("Посмотреть клиента");
         editMenuItem.setOnAction(event -> {
-            Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
-            if (selectedAbonement != null) {
+            Certificate selectedCertificate = tableViewCertificates.getSelectionModel().getSelectedItem();
+            if (selectedCertificate != null) {
                 // Действия при выборе пункта "Редактировать"
                 try {
                     DataExchanger dataExchanger = DataExchanger.getInstance();
-                    dataExchanger.setId(selectedAbonement.getId());
-                    WindowsActions.openWindow("Информация о клиенте", "clientInfoAbonements.fxml");
-                    System.out.println(selectedAbonement.getId());
+                    dataExchanger.setId(selectedCertificate.getId());
+                    WindowsActions.openWindow("Информация о клиенте", "clientInfoCertificates.fxml");
+                    System.out.println(selectedCertificate.getId());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         });
 
-        MenuItem archiveMenuItem = new MenuItem("Разархивировать абонемент");
+        MenuItem archiveMenuItem = new MenuItem("Разархивировать сертификат");
         archiveMenuItem.setOnAction(event -> {
-            Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
-            if (selectedAbonement != null) {
+            Certificate selectedCertificate = tableViewCertificates.getSelectionModel().getSelectedItem();
+            if (selectedCertificate != null) {
                 try {
                     DB db = DB.getBase();
-                    db.unArchiveAbonement(selectedAbonement.getId());
-                    System.out.println("В архив отправился абонемент с id " + selectedAbonement.getId());
-                    tableViewAbonements.getItems().remove(selectedAbonement);
+                    db.unArchiveCertificate(selectedCertificate.getId());
+                    System.out.println("В архив отправился сертификат с id " + selectedCertificate.getId());
+                    tableViewCertificates.getItems().remove(selectedCertificate);
                 } catch (SQLException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
@@ -72,9 +73,9 @@ public class ArchiveToAbonementsController {
         contextMenu.getItems().addAll(editMenuItem, archiveMenuItem);
 
         // Установка обработчика для открытия контекстного меню при щелчке правой кнопкой мыши
-        tableViewAbonements.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+        tableViewCertificates.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
-                contextMenu.show(tableViewAbonements, event.getScreenX(), event.getScreenY());
+                contextMenu.show(tableViewCertificates, event.getScreenX(), event.getScreenY());
             }
         });
     }

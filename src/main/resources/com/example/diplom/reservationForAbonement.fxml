@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Text?>
 
 
-<AnchorPane prefHeight="287.0" prefWidth="415.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.diplom.Controllers.ReservationForAbonement">
+<AnchorPane prefHeight="287.0" prefWidth="415.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.diplom.Controllers.ReservationForAbonementController">
    <children>
       <HBox layoutX="10.0" layoutY="49.0" prefHeight="60.0" prefWidth="396.0">
          <children>

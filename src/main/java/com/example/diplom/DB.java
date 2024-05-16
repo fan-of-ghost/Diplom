@@ -124,11 +124,29 @@ public class DB {
         }
     }
 
+    public void archiveCertificate(int certificateId) throws SQLException, ClassNotFoundException {
+        String sql = "UPDATE `Сертификаты` SET архив = 'в архиве' WHERE id_сертификата = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, certificateId);
+            statement.executeUpdate();
+        }
+    }
+
     public void unArchiveAbonement(int abonementId) throws SQLException, ClassNotFoundException {
         String sql = "UPDATE `Абонементы` SET архив = 'не в архиве' WHERE id_абонемента = ?";
         try (Connection connection = getDbConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, abonementId);
+            statement.executeUpdate();
+        }
+    }
+
+    public void unArchiveCertificate(int certificateId) throws SQLException, ClassNotFoundException {
+        String sql = "UPDATE `Сертификаты` SET архив = 'не в архиве' WHERE id_сертификата = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, certificateId);
             statement.executeUpdate();
         }
     }
@@ -222,7 +240,38 @@ public class DB {
 
     public List<Certificate> getCertificates() {
         List<Certificate> certificates = new ArrayList<>();
-        String sql = "SELECT ser.*, st.название AS статус FROM `Сертификаты` ser INNER JOIN `Статусы` st ON ser.id_статуса = st.id_статуса";
+        String sql = "SELECT ser.*, st.название AS статус " +
+                "FROM `Сертификаты` ser " +
+                "INNER JOIN `Статусы` st ON ser.id_статуса = st.id_статуса " +
+                "WHERE ser.архив = 'не в архиве'";
+        try (Connection connection = getDbConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                // Создаем объект абонемента и заполняем его данными из результата запроса
+                Certificate certificate = new Certificate();
+                certificate.setId(resultSet.getInt("id_сертификата"));
+                certificate.setNominal(resultSet.getInt("номинал_в_минутах"));
+                certificate.setDateOfUse(resultSet.getDate("дата_использования"));
+                certificate.setBalance(resultSet.getInt("остаток_в_минутах"));
+                certificate.setDateOfBuy(resultSet.getDate("дата_покупки"));
+                certificate.setDateOfEnd(resultSet.getDate("дата_истечения"));
+                certificate.setStatus(resultSet.getString("статус"));
+                certificate.setIdClient(resultSet.getInt("id_клиента"));
+                certificates.add(certificate);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return certificates;
+    }
+
+    public List<Certificate> getInactiveCertificates() {
+        List<Certificate> certificates = new ArrayList<>();
+        String sql = "SELECT ser.*, st.название AS статус " +
+                "FROM `Сертификаты` ser " +
+                "INNER JOIN `Статусы` st ON ser.id_статуса = st.id_статуса " +
+                "WHERE ser.архив = 'в архиве'";
         try (Connection connection = getDbConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
@@ -278,6 +327,31 @@ public class DB {
                 "WHERE a.`id_абонемента` = ?";
         try (PreparedStatement statement = getDbConnection().prepareStatement(sql)) {
             statement.setInt(1, abonementId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int id = resultSet.getInt("id_клиента");
+                String surname = resultSet.getString("фамилия");
+                String name = resultSet.getString("имя");
+                String patronymic = resultSet.getString("отчество");
+                String phoneNumber = resultSet.getString("контактный_телефон");
+                String email = resultSet.getString("адрес_электронной_почты");
+
+                return new Client(id, surname, name, patronymic, phoneNumber, email);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Client getClientByCertificateId(int certificateId) {
+        String sql = "SELECT c.`id_клиента`, c.`фамилия`, c.`имя`, c.`отчество`, c.`контактный_телефон`, c.`адрес_электронной_почты` " +
+                "FROM `Клиенты` c " +
+                "JOIN `Сертификаты` cer ON c.`id_клиента` = cer.`id_клиента` " +
+                "WHERE cer.`id_сертификата` = ?";
+        try (PreparedStatement statement = getDbConnection().prepareStatement(sql)) {
+            statement.setInt(1, certificateId);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
@@ -443,12 +517,55 @@ public class DB {
         return ""; // Если не найдено, возвращаем пустоту
     }
 
-    public Set<Client> getClientsForPeriod(LocalDate startDate, LocalDate endDate) {
+    public String checkStateByIdCertificate(int id) {
+        String sql = "SELECT `состояние` FROM `Сертификаты` WHERE `id_сертификата` = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("состояние");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return ""; // Если не найдено, возвращаем пустоту
+    }
+
+    public Set<Client> getClientsForPeriodAbonement(LocalDate startDate, LocalDate endDate) {
         Set<Client> clients = new HashSet<>();
         String sql = "SELECT DISTINCT c.* " +
                 "FROM `Абонементы` a " +
                 "JOIN `Клиенты` c ON a.id_клиента = c.id_клиента " +
                 "WHERE a.дата_использования BETWEEN ? AND ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setDate(1, Date.valueOf(startDate));
+            statement.setDate(2, Date.valueOf(endDate));
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id_клиента");
+                String lastName = resultSet.getString("фамилия");
+                String firstName = resultSet.getString("имя");
+                String middleName = resultSet.getString("отчество");
+                String phone = resultSet.getString("контактный_телефон");
+                String email = resultSet.getString("адрес_электронной_почты");
+
+                // Создание объекта клиента и добавление его в множество
+                clients.add(new Client(id, lastName, firstName, middleName, phone, email));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return clients;
+    }
+
+    public Set<Client> getClientsForPeriodCertificate(LocalDate startDate, LocalDate endDate) {
+        Set<Client> clients = new HashSet<>();
+        String sql = "SELECT DISTINCT c.* " +
+                "FROM `Сертификаты` ser " +
+                "JOIN `Клиенты` c ON ser.id_клиента = c.id_клиента " +
+                "WHERE ser.дата_использования BETWEEN ? AND ?";
         try (Connection connection = getDbConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setDate(1, Date.valueOf(startDate));
@@ -486,11 +603,38 @@ public class DB {
         return 0; // Если не найдено, возвращаем 0 или обрабатываем по-другому
     }
 
-    public void insertReservation(int abonementId, LocalDate reservationDate) throws SQLException {
+    public int getBalanceCertificate(int id) {
+        String sql = "SELECT номинал_в_минутах FROM Сертификаты WHERE id_сертификата = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("номинал_в_минутах");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0; // Если не найдено, возвращаем 0 или обрабатываем по-другому
+    }
+
+    public void insertReservationAbonement(int abonementId, LocalDate reservationDate) throws SQLException {
         String sql = "INSERT INTO График_абонементов (id_абонемента, дата_использования) VALUES (?, ?)";
         try (Connection connection = getDbConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, abonementId);
+            statement.setDate(2, java.sql.Date.valueOf(reservationDate));
+            statement.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("MySQL JDBC Driver не найден", e);
+        }
+    }
+
+    public void insertReservationCertificate(int certificateId, LocalDate reservationDate) throws SQLException {
+        String sql = "INSERT INTO График_сертификатов (id_сертификата, дата_использования) VALUES (?, ?)";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, certificateId);
             statement.setDate(2, java.sql.Date.valueOf(reservationDate));
             statement.executeUpdate();
         } catch (ClassNotFoundException e) {
@@ -510,4 +654,15 @@ public class DB {
         }
     }
 
+    public void updateCertificate(int certificateId, int minutesUsed) throws SQLException {
+        String sql = "UPDATE Сертификаты SET остаток_в_минутах = остаток_в_минутах - ? WHERE id_сертификата = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, minutesUsed);
+            statement.setInt(2, certificateId);
+            statement.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("MySQL JDBC Driver не найден", e);
+        }
+    }
 }

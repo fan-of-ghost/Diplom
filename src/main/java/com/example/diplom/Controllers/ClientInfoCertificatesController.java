@@ -1,39 +1,36 @@
 package com.example.diplom.Controllers;
 
+import com.example.diplom.DB;
 import com.example.diplom.Products.Client;
 import com.example.diplom.addLibraries.DataExchanger;
-import com.example.diplom.DB;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
 
-public class ClientInfoController {
+public class ClientInfoCertificatesController {
     @FXML
     private Text numberField;
-
     @FXML
     private Text fioField;
-
     @FXML
     private Text contactNumberField;
-
     @FXML
     private Text mailField;
 
     public void initialize() {
         // Получаем id абонемента из DataExchanger
         DataExchanger dataExchanger = DataExchanger.getInstance();
-        int abonementId = dataExchanger.getId();
+        int certificateId = dataExchanger.getId();
 
         // Получаем информацию о клиенте по id абонемента
-        Client client = getClientByAbonementId(abonementId);
+        Client client = getClientByCertificateId(certificateId);
 
         // Вставляем данные о клиенте в соответствующие поля
         setClientInfo(client);
     }
 
-    private Client getClientByAbonementId(int abonementId) {
+    private Client getClientByCertificateId(int certificateId) {
         DB db = DB.getBase();
-        return db.getClientByAbonementId(abonementId);
+        return db.getClientByCertificateId(certificateId);
     }
 
     public void setClientInfo(Client client) {

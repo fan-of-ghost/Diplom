@@ -3,28 +3,40 @@ package com.example.diplom.Controllers;
 import com.example.diplom.DB;
 import com.example.diplom.Products.Abonement;
 import com.example.diplom.Products.Certificate;
+import com.example.diplom.addLibraries.DataExchanger;
 import com.example.diplom.addLibraries.WindowsActions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public class MainAdminCertificatesController {
+    @FXML
+    private TableColumn<Date, Date> dateOfEndCertificate;
     @FXML
     private TableView<Certificate> tableViewCertificates;
 
     @FXML
     void initialize() {
         loadCertificates();
+
+        setupColorForDateOfEnd();
+
+        setupContextMenu();
     }
 
+    @FXML
     private void loadCertificates() {
         DB db = DB.getBase();
         try {
@@ -72,5 +84,106 @@ public class MainAdminCertificatesController {
         }
     }
 
+    private void setupColorForDateOfEnd() {
+        dateOfEndCertificate.setCellFactory(column -> {
+            return new TableCell<Date, Date>() {
+                @Override
+                protected void updateItem(Date item, boolean empty) {
+                    super.updateItem(item, empty);
 
+                    // Проверяем, пуста ли ячейка или равна ли ей null
+                    if (empty || item == null) {
+                        setText(null); // Очищаем текст ячейки
+                        setGraphic(null); // Очищаем графическое содержимое ячейки
+                        setStyle(""); // Сбрасываем стиль
+                    } else {
+                        // Устанавливаем текст ячейки
+                        setText(item.toString());
+
+                        // Проверяем, что дата продления меньше текущей даты
+                        if (item.toLocalDate().isBefore(LocalDate.now())) {
+                            // Если условие выполнено, устанавливаем красный цвет фона ячейки, белый цвет текста и выравнивание текста по центру
+                            setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
+                        } else {
+                            // Иначе используем стандартный стиль
+                            setStyle("-fx-alignment: center;");
+                        }
+                    }
+                }
+            };
+        });
+    }
+
+    private void setupContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem editMenuItem = new MenuItem("Посмотреть клиента");
+        MenuItem archiveMenuItem = new MenuItem("Архивировать сертификат");
+
+        // Добавляем обработчики действий для каждого пункта меню
+
+        editMenuItem.setOnAction(event -> {
+            Certificate selectedCertificate = tableViewCertificates.getSelectionModel().getSelectedItem();
+            if (selectedCertificate != null) {
+                try {
+                    DataExchanger dataExchanger = DataExchanger.getInstance();
+                    dataExchanger.setId(selectedCertificate.getId());
+                    WindowsActions.openWindow("Информация о клиенте", "clientInfoCertificates.fxml");
+                    System.out.println(selectedCertificate.getId());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        archiveMenuItem.setOnAction(event -> {
+            Certificate selectedCertificate = tableViewCertificates.getSelectionModel().getSelectedItem();
+            if (selectedCertificate != null) {
+                try {
+                    DB db = DB.getBase();
+                    db.archiveCertificate(selectedCertificate.getId());
+                    System.out.println("В архив отправился сертификат с id " + selectedCertificate.getId());
+                    tableViewCertificates.getItems().remove(selectedCertificate);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        // Добавляем пункты меню
+        contextMenu.getItems().addAll(editMenuItem, archiveMenuItem);
+
+        // Устанавливаем обработчик для открытия контекстного меню
+        tableViewCertificates.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if (event.getButton() == MouseButton.SECONDARY) {
+                // Проверяем, удовлетворяет ли выбранный абонемент условию для отображения пункта "Архивировать абонемент"
+                Certificate selectedCertificate = tableViewCertificates.getSelectionModel().getSelectedItem();
+                if (selectedCertificate!= null) {
+                    try {
+                        DB db = DB.getBase();
+                        boolean isInactive = db.checkStateByIdCertificate(selectedCertificate.getId()).equals("disactive");
+                        archiveMenuItem.setVisible(isInactive); // Устанавливаем видимость пункта меню в зависимости от результата проверки
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                contextMenu.show(tableViewCertificates, event.getScreenX(), event.getScreenY());
+            }
+        });
+    }
+
+    public void onLoadToFileClick() throws IOException {
+        WindowsActions.openModalWindow("Импорт таблиц из csv", "importTables.fxml");
+    }
+
+    public void openModalWindowArchiveToCertificates() throws IOException {
+        WindowsActions.openModalWindow("Архив просроченных сертификатов", "archiveToCertificates.fxml");
+    }
+
+    public void clientForPeriod() throws IOException {
+        WindowsActions.openModalWindow("Сотрудники за период", "exportClientsForPeriodCertificate.fxml");
+    }
+
+    public void openReservation() throws IOException {
+        WindowsActions.openModalWindow("Бронирование заезда по абонементу", "reservationForCertificate.fxml");
+    }
 }

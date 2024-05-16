@@ -2,21 +2,19 @@ package com.example.diplom.Controllers;
 
 import com.example.diplom.DB;
 import com.example.diplom.Products.Abonement;
+import com.example.diplom.Products.Certificate;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
-public class ReservationForAbonement {
+public class ReservationForCertificateController {
     @FXML
     private Spinner<Integer> spinnerMinutes;
     @FXML
-    private ComboBox<Integer> comboboxIdAbonement;
+    private ComboBox<Integer> comboboxIdCertificate;
     @FXML
     private DatePicker dateOfReservation;
 
@@ -46,24 +44,24 @@ public class ReservationForAbonement {
     @FXML
     private void insertIdAndBalance() {
         // Очищаем comboboxIdAbonement
-        comboboxIdAbonement.getItems().clear();
+        comboboxIdCertificate.getItems().clear();
 
         // Получаем доступ к базе данных
         DB db = DB.getBase();
 
         // Получаем список доступных абонементов из базы данных
-        for (Abonement abonement : db.getAbonements()) {
+        for (Certificate certificate : db.getCertificates()) {
             // Добавляем идентификатор абонемента в комбобокс
-            comboboxIdAbonement.getItems().add(abonement.getId());
+            comboboxIdCertificate.getItems().add(certificate.getId());
         }
 
         // Устанавливаем слушателя для выбора абонемента
-        comboboxIdAbonement.setOnAction(event -> {
+        comboboxIdCertificate.setOnAction(event -> {
             // Получаем выбранный абонемент из комбобокса
-            int selectedAbonementId = comboboxIdAbonement.getValue();
+            int selectedCertificateId = comboboxIdCertificate.getValue();
 
             // Получаем баланс выбранного абонемента из базы данных
-            int abonementBalance = db.getBalanceAbonement(selectedAbonementId);
+            int abonementBalance = db.getBalanceCertificate(selectedCertificateId);
 
             // Устанавливаем баланс абонемента как максимальное значение для спиннера
             spinnerMinutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, abonementBalance, 0));
@@ -72,7 +70,7 @@ public class ReservationForAbonement {
 
     @FXML
     private void reserveButton() {
-        int selectedAbonementId = comboboxIdAbonement.getValue();
+        int selectedCertificateId = comboboxIdCertificate.getValue();
         int minutesToUse = spinnerMinutes.getValue();
         LocalDate reservationDate = dateOfReservation.getValue();
 
@@ -81,10 +79,10 @@ public class ReservationForAbonement {
 
         try {
             // Вставляем данные в таблицу График_абонементов
-            db.insertReservation(selectedAbonementId, reservationDate);
+            db.insertReservationCertificate(selectedCertificateId, reservationDate);
 
             // Обновляем данные в таблице Абонементы
-            db.updateAbonement(selectedAbonementId, minutesToUse);
+            db.updateCertificate(selectedCertificateId, minutesToUse);
 
         } catch (SQLException e) {
             e.printStackTrace();
