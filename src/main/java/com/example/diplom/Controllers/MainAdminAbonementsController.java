@@ -192,4 +192,8 @@ public class MainAdminAbonementsController {
     public void openSchedule() throws IOException {
         WindowsActions.openModalWindow("Расписание абонементов", "scheduleAbonements.fxml");
     }
+
+    public void extensionAbonement() throws IOException {
+        WindowsActions.openModalWindow("Продление абонемента", "extensionAbonement.fxml");
+    }
 }

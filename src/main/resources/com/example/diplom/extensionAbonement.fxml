@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="200.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.diplom.Controllers.ExtensionAbonementController">
+
+    <children>
+        <VBox layoutX="50.0" layoutY="30.0" spacing="20.0">
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Label text="ID Абонемента:" />
+                <Region HBox.hgrow="ALWAYS" />
+                <TextField fx:id="abonementIdField" prefWidth="200.0" />
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Label text="Количество минут:" />
+                <Region HBox.hgrow="ALWAYS" />
+                <TextField fx:id="minutesField" prefWidth="200.0" />
+            </HBox>
+
+            <HBox alignment="CENTER" prefHeight="54.0" prefWidth="324.0" spacing="20.0">
+                <Button fx:id="saveButton" onAction="#handleSave" prefWidth="100.0" text="Сохранить" />
+                <Button fx:id="cancelButton" onAction="#handleCancel" prefWidth="100.0" text="Отклонить" />
+            </HBox>
+        </VBox>
+    </children>
+
+</AnchorPane>

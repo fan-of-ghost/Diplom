@@ -123,12 +123,12 @@
       </HBox>
       <HBox layoutX="16.0" layoutY="252.0" prefHeight="54.0" prefWidth="566.0">
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Заезды" wrappingWidth="140.0">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Заезды по абонементам" wrappingWidth="140.0">
                <font>
                   <Font size="16.0" />
                </font>
             </Text>
-            <Button fx:id="selectButtonRace" mnemonicParsing="false" onAction="#selectFileRace" prefHeight="26.0" prefWidth="110.0" text="Выбрать файл">
+            <Button fx:id="selectButtonAbonementRace" mnemonicParsing="false" onAction="#selectFileAbonementRace" prefHeight="26.0" prefWidth="110.0" text="Выбрать файл">
                <HBox.margin>
                   <Insets left="40.0" />
                </HBox.margin>
@@ -146,8 +146,43 @@
                   <Insets left="10.0" />
                </HBox.margin>
                <children>
-                  <Button fx:id="importButtonRace" mnemonicParsing="false" onAction="#importRace" text="Импорт" />
+                  <Button fx:id="importButtonAbonementRace" mnemonicParsing="false" onAction="#importAbonementRace" text="Импорт" />
                   <Label fx:id="markRace" alignment="CENTER" prefHeight="18.0" prefWidth="55.0" text="✔" textFill="#00f72d" visible="false">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox layoutX="17.0" layoutY="306.0" prefHeight="54.0" prefWidth="566.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Заезды по сертификатам" wrappingWidth="140.0">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+            <Button fx:id="selectButtonCertificateRace" mnemonicParsing="false" onAction="#selectFileCertificateRace" prefHeight="26.0" prefWidth="110.0" text="Выбрать файл">
+               <HBox.margin>
+                  <Insets left="40.0" />
+               </HBox.margin>
+            </Button>
+            <Label fx:id="fileNameLabelRace1" prefHeight="26.0" prefWidth="200.0" textAlignment="CENTER" visible="false">
+               <font>
+                  <Font size="13.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </Label>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+               <children>
+                  <Button fx:id="importButtonCertificateRace" mnemonicParsing="false" onAction="#importCertificateRace" text="Импорт" />
+                  <Label fx:id="markRace1" alignment="CENTER" prefHeight="18.0" prefWidth="55.0" text="✔" textFill="#00f72d" visible="false">
                      <font>
                         <Font size="14.0" />
                      </font>

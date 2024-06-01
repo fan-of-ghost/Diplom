@@ -113,6 +113,7 @@
                   <items>
                     <MenuItem fx:id="addNewAbonement" mnemonicParsing="false" onAction="#onAddClick" text="Добавить" />
                         <MenuItem mnemonicParsing="false" onAction="#loadAbonements" text="Обновить таблицу" />
+                        <MenuItem mnemonicParsing="false" onAction="#extensionAbonement" text="Продлить абонемент" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="График">

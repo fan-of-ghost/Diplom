@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.diplom.Controllers.RacesOnDayController"
+            prefHeight="400.0" prefWidth="600.0">
+    <ListView fx:id="racesListView" layoutX="10.0" layoutY="10.0" prefHeight="380.0" prefWidth="580.0" />
+</AnchorPane>

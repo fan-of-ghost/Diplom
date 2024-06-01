@@ -17,9 +17,13 @@ import java.util.Scanner;
 
 public class ImportTablesController {
     @FXML
+    private Button importButtonCertificateRace;
+    @FXML
+    private Button selectButtonCertificateRace;
+    @FXML
     private Label markRace;
     @FXML
-    private Button importButtonRace;
+    private Button importButtonAbonementRace;
     @FXML
     private Button importButtonAbonement;
     @FXML
@@ -33,7 +37,7 @@ public class ImportTablesController {
     @FXML
     private Button importButtonClient;
     @FXML
-    private Button selectButtonRace;
+    private Button selectButtonAbonementRace;
     @FXML
     private Label fileNameLabelRace;
     @FXML
@@ -51,7 +55,8 @@ public class ImportTablesController {
     private File selectedFileClient;
     private File selectedFileCertificate;
     private File selectedFileAbonement;
-    private File selectedFileRace;
+    private File selectedFileAbonementRace;
+    private File selectedFileCertificateRace;
 
     @FXML
     private void selectFileClient() {
@@ -138,7 +143,7 @@ public class ImportTablesController {
     }
 
     @FXML
-    private void selectFileRace() {
+    private void selectFileAbonementRace() {
         // Создание объекта FileChooser
         FileChooser fileChooser = new FileChooser();
 
@@ -150,14 +155,14 @@ public class ImportTablesController {
         fileChooser.getExtensionFilters().add(extFilter);
 
         // Получение основной сцены из кнопки
-        Stage stage = (Stage) selectButtonRace.getScene().getWindow();
+        Stage stage = (Stage) selectButtonAbonementRace.getScene().getWindow();
 
         // Открытие диалогового окна и получение выбранного файла
-        selectedFileRace = fileChooser.showOpenDialog(stage);
+        selectedFileAbonementRace = fileChooser.showOpenDialog(stage);
 
         // Обработка выбранного файла
-        if (selectedFileRace != null) {
-            fileNameLabelRace.setText(selectedFileRace.getName());
+        if (selectedFileAbonementRace != null) {
+            fileNameLabelRace.setText(selectedFileAbonementRace.getName());
             fileNameLabelRace.setVisible(true);
         } else {
             fileNameLabelRace.setText("");
@@ -438,14 +443,14 @@ public class ImportTablesController {
     }
 
     @FXML
-    private void importRace() {
+    private void importAbonementRace() {
         // Получаем выбранный файл
-        File selectedFile = selectedFileRace;
+        File selectedFile = selectedFileAbonementRace;
 
         // Проверяем, что файл выбран
         if (selectedFile != null) {
             // Показываем кнопку "Импорт", так как файл выбран
-            importButtonRace.setVisible(true);
+            importButtonAbonementRace.setVisible(true);
 
             try (Scanner scanner = new Scanner(selectedFile)) {
                 // Пропускаем первую строку, если это заголовок
@@ -456,8 +461,9 @@ public class ImportTablesController {
                 // Создаем объект базы данных
                 DB db = DB.getBase();
 
-                // Создаем строку для хранения совпадающих идентификаторов
+                // Создаем строки для хранения совпадающих идентификаторов и несуществующих абонементов
                 StringBuilder duplicateIds = new StringBuilder();
+                StringBuilder nonExistentIds = new StringBuilder();
 
                 // Открываем соединение с базой данных
                 try (Connection connection = db.getDbConnection()) {
@@ -471,30 +477,23 @@ public class ImportTablesController {
                         line = line.replaceAll("\"", "");
                         String[] data = line.split(","); // предполагается, что данные разделены запятой
 
-                        // Предполагается, что данные в файле имеют следующий порядок: фамилия, имя, отчество, телефон, email
-                        if (data.length == 5) {
+                        // Предполагается, что данные в файле имеют следующий порядок: id, дата, затраченное время, id абонемента
+                        if (data.length == 4) {
                             int id = Integer.parseInt(data[0]);
                             LocalDate date = LocalDate.parse(data[1]);
-                            Integer idCertificate = null; // Устанавливаем значение по умолчанию для id сертификата
-                            Integer idAbonement = null; // Устанавливаем значение по умолчанию для id абонемента
-
                             int spent = Integer.parseInt(data[2]);
-
-                            // Проверяем, не равно ли значение "null" для id сертификата
-                            if (!data[3].equalsIgnoreCase("null")) {
-                                idCertificate = Integer.parseInt(data[3]);
-                            }
-
-                            // Проверяем, не равно ли значение "null" для id абонемента
-                            if (!data[4].equalsIgnoreCase("null")) {
-                                idAbonement = Integer.parseInt(data[4]);
-                            }
+                            int idAbonement = Integer.parseInt(data[3]);
 
                             // Проверяем, существует ли запись с таким же id
-                            if (!db.raceExists(id)) {
-                                // Если записи с таким id не существует, добавляем нового клиента в базу данных
-                                db.addNewRace(id, date, spent, idCertificate, idAbonement);
-                                markRace.setVisible(true);
+                            if (!db.abonementRaceExists(id)) {
+                                // Проверяем, существует ли абонемент с таким id
+                                if (db.abonementExists(idAbonement)) {
+                                    // Если абонемент существует, добавляем новый заезд в график абонементов
+                                    db.addNewAbonementRace(id, date, spent, idAbonement);
+                                    markRace.setVisible(true);
+                                } else {
+                                    nonExistentIds.append(idAbonement).append(", ");
+                                }
                             } else {
                                 // Если запись с таким id уже существует, добавляем id в строку с совпадающими идентификаторами
                                 duplicateIds.append(id).append(", ");
@@ -515,6 +514,15 @@ public class ImportTablesController {
                         CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка", "Дублирование записи", "Записи с идентификаторами " + duplicateIds + " уже существуют в базе данных.");
                     }
 
+                    // Проверяем, были ли найдены несуществующие абонементы
+                    if (nonExistentIds.length() > 0) {
+                        // Удаляем последнюю запятую и пробел
+                        nonExistentIds.delete(nonExistentIds.length() - 2, nonExistentIds.length());
+                        // Выводим сообщение об ошибке только если найдены несуществующие абонементы
+                        System.err.println("Абонементы с идентификаторами " + nonExistentIds + " не существуют в базе данных.");
+                        CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка", "Несуществующие абонементы", "Абонементы с идентификаторами " + nonExistentIds + " не существуют в базе данных.");
+                    }
+
                     // Все данные успешно импортированы
                     System.out.println("Данные успешно импортированы в базу данных.");
                 } catch (ClassNotFoundException e) {
@@ -529,11 +537,141 @@ public class ImportTablesController {
                 System.err.println("Файл не найден: " + e.getMessage());
                 CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка", "Файл не найден", "");
             }
-
         } else {
             // Если файл не выбран, выводим сообщение об ошибке
             System.err.println("Файл не выбран.");
             CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка", "Файл не выбран", "");
         }
     }
+
+    @FXML
+    private void selectFileCertificateRace() {
+        // Создание объекта FileChooser
+        FileChooser fileChooser = new FileChooser();
+
+        // Настройка заголовка диалогового окна
+        fileChooser.setTitle("Выберите файл");
+
+        // Установка фильтра расширений файлов
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        // Получение основной сцены из кнопки
+        Stage stage = (Stage) selectButtonCertificateRace.getScene().getWindow();
+
+        // Открытие диалогового окна и получение выбранного файла
+        selectedFileCertificateRace = fileChooser.showOpenDialog(stage);
+
+        // Обработка выбранного файла
+        if (selectedFileCertificateRace != null) {
+            fileNameLabelRace.setText(selectedFileCertificateRace.getName());
+            fileNameLabelRace.setVisible(true);
+        } else {
+            fileNameLabelRace.setText("");
+            fileNameLabelRace.setVisible(false);
+        }
+    }
+
+    @FXML
+    private void importCertificateRace() {
+        // Получаем выбранный файл
+        File selectedFile = selectedFileCertificateRace;
+
+        // Проверяем, что файл выбран
+        if (selectedFile != null) {
+            // Показываем кнопку "Импорт", так как файл выбран
+            importButtonCertificateRace.setVisible(true);
+
+            try (Scanner scanner = new Scanner(selectedFile)) {
+                // Пропускаем первую строку, если это заголовок
+                if (scanner.hasNextLine()) {
+                    scanner.nextLine(); // пропускаем заголовок
+                }
+
+                // Создаем объект базы данных
+                DB db = DB.getBase();
+
+                // Создаем строки для хранения совпадающих идентификаторов и несуществующих сертификатов
+                StringBuilder duplicateIds = new StringBuilder();
+                StringBuilder nonExistentIds = new StringBuilder();
+
+                // Открываем соединение с базой данных
+                try (Connection connection = db.getDbConnection()) {
+                    // Читаем данные из файла и вставляем их в базу данных
+                    while (scanner.hasNextLine()) {
+                        String line = scanner.nextLine().trim(); // удаляем пробелы в начале и в конце строки
+                        if (line.isEmpty()) {
+                            continue; // пропускаем пустые строки
+                        }
+                        // Удаляем кавычки из строки
+                        line = line.replaceAll("\"", "");
+                        String[] data = line.split(","); // предполагается, что данные разделены запятой
+
+                        // Предполагается, что данные в файле имеют следующий порядок: id, дата, затраченное время, id сертификата
+                        if (data.length == 4) {
+                            int id = Integer.parseInt(data[0]);
+                            LocalDate date = LocalDate.parse(data[1]);
+                            int spent = Integer.parseInt(data[2]);
+                            int idCertificate = Integer.parseInt(data[3]);
+
+                            // Проверяем, существует ли запись с таким же id
+                            if (!db.certificateRaceExists(id)) {
+                                // Проверяем, существует ли сертификат с таким id
+                                if (db.certificateExists(idCertificate)) {
+                                    // Если сертификат существует, добавляем новый заезд в график сертификатов
+                                    db.addNewCertificateRace(id, date, spent, idCertificate);
+                                    markRace.setVisible(true);
+                                } else {
+                                    nonExistentIds.append(idCertificate).append(", ");
+                                }
+                            } else {
+                                // Если запись с таким id уже существует, добавляем id в строку с совпадающими идентификаторами
+                                duplicateIds.append(id).append(", ");
+                            }
+                        } else {
+                            // Если данные в файле неправильные, выводим сообщение об ошибке
+                            System.err.println("Неправильный формат данных в файле: " + line);
+                            CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка", "Неправильный формат", "Неправильный формат данных в файле: \n" + line);
+                        }
+                    }
+
+                    // После завершения цикла проверяем, были ли найдены дубликаты
+                    if (duplicateIds.length() > 0) {
+                        // Удаляем последнюю запятую и пробел
+                        duplicateIds.delete(duplicateIds.length() - 2, duplicateIds.length());
+                        // Выводим сообщение об ошибке только если найдены дубликаты
+                        System.err.println("Записи с идентификаторами " + duplicateIds + " уже существуют в базе данных.");
+                        CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка", "Дублирование записи", "Записи с идентификаторами " + duplicateIds + " уже существуют в базе данных.");
+                    }
+
+                    // Проверяем, были ли найдены несуществующие сертификаты
+                    if (nonExistentIds.length() > 0) {
+                        // Удаляем последнюю запятую и пробел
+                        nonExistentIds.delete(nonExistentIds.length() - 2, nonExistentIds.length());
+                        // Выводим сообщение об ошибке только если найдены несуществующие сертификаты
+                        System.err.println("Сертификаты с идентификаторами " + nonExistentIds + " не существуют в базе данных.");
+                        CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка", "Несуществующие сертификаты", "Сертификаты с идентификаторами " + nonExistentIds + " не существуют в базе данных.");
+                    }
+
+                    // Все данные успешно импортированы
+                    System.out.println("Данные успешно импортированы в базу данных.");
+                } catch (ClassNotFoundException e) {
+                    // Обработка ошибок соединения с базой данных
+                    System.err.println("Ошибка при соединении с базой данных: " + e.getMessage());
+                    CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка", "Ошибка при соединении с базой данных", "");
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            } catch (FileNotFoundException e) {
+                // Обработка ошибок открытия файла
+                System.err.println("Файл не найден: " + e.getMessage());
+                CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка", "Файл не найден", "");
+            }
+        } else {
+            // Если файл не выбран, выводим сообщение об ошибке
+            System.err.println("Файл не выбран.");
+            CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка", "Файл не выбран", "");
+        }
+    }
+
 }

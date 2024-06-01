@@ -8,7 +8,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 public class LoginController {
     @FXML
@@ -17,19 +16,17 @@ public class LoginController {
     private TextField login;
     @FXML
     private PasswordField password;
-    public TextField passwordText;
+    @FXML
+    private TextField passwordText;
 
     @FXML
     void view_pass_click() {
-        //Проверка: видимо поле с паролем или нет
-        //Если видимо
+        // Проверка: видимо поле с паролем или нет
         if (password.isVisible()) {
             passwordText.setVisible(true);
             passwordText.setText(password.getText());
             password.setVisible(false);
-        }
-        //Если не видимо
-        else {
+        } else {
             password.setVisible(true);
             password.setText(passwordText.getText());
             passwordText.setVisible(false);
@@ -38,7 +35,7 @@ public class LoginController {
 
     @FXML
     void enter_button_click(ActionEvent event) throws IOException, ClassNotFoundException {
-        //trim() - убирает пробелы до и после текста
+        // trim() - убирает пробелы до и после текста
         String log = login.getText().trim();
         String pass;
 
@@ -48,21 +45,27 @@ public class LoginController {
             pass = passwordText.getText().trim();
         }
 
-        if (!log.isEmpty()&&!pass.isEmpty()) {
-            DB db = DB.getBase();
+        if (!log.isEmpty() && !pass.isEmpty()) {
+            try {
+                DB db = DB.getBase();
 
-            if (db.checkRole(log,pass) == 1) {
-                WindowsActions.changeWindow(event,"Список заказов гл админа","mainAdminMenu.fxml");
+                int role = db.checkRole(log, pass);
+                if (role == 1) {
+                    WindowsActions.changeWindow(event, "Список заказов гл админа", "mainAdminMenu.fxml");
+                } else if (role == 2) {
+                    WindowsActions.changeWindow(event, "Список заказов админа", "nonMainAdminMenu.fxml");
+                } else {
+                    CreateAlert.showAlert(Alert.AlertType.ERROR, "Авторизация", "Ошибка", "Неверный логин или пароль");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка ввода-вывода", "Ошибка при переключении окон", "Произошла ошибка при переключении окон. Попробуйте позже.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка базы данных", "Ошибка при подключении к базе данных", "Не удалось подключиться к базе данных. Попробуйте позже.");
             }
-            else if (db.checkRole(log,pass) == 2) {
-                WindowsActions.changeWindow(event,"Список заказов админа","nonMainAdminMenu.fxml");
-            }
-            else {
-                CreateAlert.showAlert(Alert.AlertType.ERROR, "Авторизация","Ошибка","Неверный логин или пароль");
-            }
-        }
-        else {
-            CreateAlert.showAlert(Alert.AlertType.WARNING, "Предупреждение","Введены не все данные","Проверьте заполненность всех полей");
+        } else {
+            CreateAlert.showAlert(Alert.AlertType.WARNING, "Предупреждение", "Введены не все данные", "Проверьте заполненность всех полей.");
         }
     }
 }
