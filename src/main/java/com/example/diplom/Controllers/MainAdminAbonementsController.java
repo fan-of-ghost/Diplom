@@ -13,7 +13,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import com.example.diplom.addLibraries.DataExchanger;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,14 +25,12 @@ public class MainAdminAbonementsController {
     @FXML
     private TableView<Abonement> tableViewAbonements;
     @FXML
-    private TableColumn <Date, Date> dateOfEndAbonement;
+    private TableColumn<Date, Date> dateOfEndAbonement;
 
     @FXML
     void initialize() {
         loadAbonements();
-
         setupColorForDateOfEnd();
-
         setupContextMenu();
     }
 
@@ -120,6 +117,7 @@ public class MainAdminAbonementsController {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem editMenuItem = new MenuItem("Посмотреть клиента");
         MenuItem archiveMenuItem = new MenuItem("Архивировать абонемент");
+        MenuItem extendMenuItem = new MenuItem("Продлить на 1 год"); // Новый пункт меню для продления абонемента
 
         // Добавляем обработчики действий для каждого пункта меню
 
@@ -151,8 +149,22 @@ public class MainAdminAbonementsController {
             }
         });
 
+        extendMenuItem.setOnAction(event -> {
+            Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
+            if (selectedAbonement != null) {
+                try {
+                    DB db = DB.getBase();
+                    db.extendAbonement(selectedAbonement.getId(), 365); // Продлеваем абонемент на 365 дней
+                    System.out.println("Абонемент с id " + selectedAbonement.getId() + " продлен на 1 год");
+                    loadAbonements(); // Обновляем таблицу абонементов
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
         // Добавляем пункты меню
-        contextMenu.getItems().addAll(editMenuItem, archiveMenuItem);
+        contextMenu.getItems().addAll(editMenuItem, archiveMenuItem, extendMenuItem);
 
         // Устанавливаем обработчик для открытия контекстного меню
         tableViewAbonements.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -164,14 +176,18 @@ public class MainAdminAbonementsController {
                         DB db = DB.getBase();
                         boolean isInactive = db.checkStateByIdAbonement(selectedAbonement.getId()).equals("disactive");
                         archiveMenuItem.setVisible(isInactive); // Устанавливаем видимость пункта меню в зависимости от результата проверки
+                        extendMenuItem.setVisible(isInactive); // Устанавливаем видимость пункта меню для продления абонемента
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
                 contextMenu.show(tableViewAbonements, event.getScreenX(), event.getScreenY());
+            } else if (event.getButton() == MouseButton.PRIMARY) {
+                contextMenu.hide(); // Скрываем контекстное меню при клике левой кнопкой мыши
             }
         });
     }
+
 
     public void onLoadToFileClick() throws IOException {
         WindowsActions.openModalWindow("Импорт таблиц из csv", "importTables.fxml");

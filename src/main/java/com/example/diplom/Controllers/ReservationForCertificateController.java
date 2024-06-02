@@ -1,9 +1,8 @@
 package com.example.diplom.Controllers;
 
 import com.example.diplom.DB;
-import com.example.diplom.Products.Abonement;
 import com.example.diplom.Products.Certificate;
-import javafx.event.ActionEvent;
+import com.example.diplom.addLibraries.CreateAlert;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -20,12 +19,10 @@ public class ReservationForCertificateController {
 
     @FXML
     void initialize() {
-
         disablePastAndCurrentDates();
-
         insertIdAndBalance();
-
     }
+
     @FXML
     private void disablePastAndCurrentDates() {
         dateOfReservation.setDayCellFactory(picker -> new DateCell() {
@@ -43,49 +40,73 @@ public class ReservationForCertificateController {
 
     @FXML
     private void insertIdAndBalance() {
-        // Очищаем comboboxIdAbonement
+        // Очищаем comboboxIdCertificate
         comboboxIdCertificate.getItems().clear();
 
         // Получаем доступ к базе данных
         DB db = DB.getBase();
 
-        // Получаем список доступных абонементов из базы данных
-        for (Certificate certificate : db.getCertificates()) {
-            // Добавляем идентификатор абонемента в комбобокс
-            comboboxIdCertificate.getItems().add(certificate.getId());
+        // Получаем список доступных сертификатов из базы данных
+        for (Certificate certificate : db.getActiveCertificates()) { // Изменение в методе получения сертификатов
+            // Добавляем идентификатор сертификата в комбобокс
+            if (certificate.getBalance() > 0) {
+                comboboxIdCertificate.getItems().add(certificate.getId());
+            }
         }
 
-        // Устанавливаем слушателя для выбора абонемента
+        // Устанавливаем слушателя для выбора сертификата
         comboboxIdCertificate.setOnAction(event -> {
-            // Получаем выбранный абонемент из комбобокса
-            int selectedCertificateId = comboboxIdCertificate.getValue();
+            // Получаем выбранный сертификат из комбобокса
+            Integer selectedCertificateId = comboboxIdCertificate.getValue();
+            if (selectedCertificateId != null) {
+                // Получаем баланс выбранного сертификата из базы данных
+                int certificateBalance = db.getBalanceCertificate(selectedCertificateId);
 
-            // Получаем баланс выбранного абонемента из базы данных
-            int abonementBalance = db.getBalanceCertificate(selectedCertificateId);
-
-            // Устанавливаем баланс абонемента как максимальное значение для спиннера
-            spinnerMinutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, abonementBalance, 0));
+                // Устанавливаем баланс сертификата как максимальное значение для спиннера
+                spinnerMinutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, certificateBalance, 0));
+            } else {
+                CreateAlert.showAlert(Alert.AlertType.WARNING, "Выбор сертификата", "Сертификат не выбран", "Пожалуйста, выберите сертификат.");
+            }
         });
     }
 
     @FXML
     private void reserveButton() {
-        int selectedCertificateId = comboboxIdCertificate.getValue();
-        int minutesToUse = spinnerMinutes.getValue();
+        Integer selectedCertificateId = comboboxIdCertificate.getValue();
+        Integer minutesToUse = spinnerMinutes.getValue();
         LocalDate reservationDate = dateOfReservation.getValue();
+
+        if (selectedCertificateId == null) {
+            CreateAlert.showAlert(Alert.AlertType.WARNING, "Ошибка бронирования", "Сертификат не выбран", "Пожалуйста, выберите сертификат для бронирования.");
+            return;
+        }
+
+        if (minutesToUse == null || minutesToUse <= 0) {
+            CreateAlert.showAlert(Alert.AlertType.WARNING, "Ошибка бронирования", "Некорректное количество минут", "Пожалуйста, выберите корректное количество минут.");
+            return;
+        }
+
+        if (reservationDate == null) {
+            CreateAlert.showAlert(Alert.AlertType.WARNING, "Ошибка бронирования", "Дата не выбрана", "Пожалуйста, выберите дату для бронирования.");
+            return;
+        }
 
         // Получаем доступ к базе данных
         DB db = DB.getBase();
 
         try {
-            // Вставляем данные в таблицу График_абонементов
+            // Вставляем данные в таблицу График_сертификатов
             db.insertReservationCertificate(selectedCertificateId, reservationDate);
 
-            // Обновляем данные в таблице Абонементы
+            // Обновляем данные в таблице Сертификаты
             db.updateCertificate(selectedCertificateId, minutesToUse);
+
+            // Показать сообщение об успешном бронировании
+            CreateAlert.showAlert(Alert.AlertType.INFORMATION, "Успешное бронирование", "Бронирование прошло успешно", "Ваше бронирование на " + reservationDate + " успешно выполнено.");
 
         } catch (SQLException e) {
             e.printStackTrace();
+            CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка базы данных", "Ошибка при выполнении запроса", "Произошла ошибка при бронировании. Попробуйте еще раз.");
         }
     }
 }

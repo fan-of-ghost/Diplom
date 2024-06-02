@@ -1,14 +1,10 @@
 package com.example.diplom.Controllers;
 
 import com.example.diplom.DB;
-import com.example.diplom.Products.Abonement;
 import com.example.diplom.Products.Certificate;
 import com.example.diplom.addLibraries.DataExchanger;
 import com.example.diplom.addLibraries.WindowsActions;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
@@ -30,9 +26,7 @@ public class MainAdminCertificatesController {
     @FXML
     void initialize() {
         loadCertificates();
-
         setupColorForDateOfEnd();
-
         setupContextMenu();
     }
 
@@ -40,9 +34,9 @@ public class MainAdminCertificatesController {
     private void loadCertificates() {
         DB db = DB.getBase();
         try {
-            List<Certificate> certificate = db.getCertificates();
+            List<Certificate> certificates = db.getCertificates();
             tableViewCertificates.getItems().clear();
-            tableViewCertificates.getItems().addAll(certificate);
+            tableViewCertificates.getItems().addAll(certificates);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -155,9 +149,9 @@ public class MainAdminCertificatesController {
         // Устанавливаем обработчик для открытия контекстного меню
         tableViewCertificates.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
-                // Проверяем, удовлетворяет ли выбранный абонемент условию для отображения пункта "Архивировать абонемент"
+                // Проверяем, удовлетворяет ли выбранный сертификат условию для отображения пункта "Архивировать сертификат"
                 Certificate selectedCertificate = tableViewCertificates.getSelectionModel().getSelectedItem();
-                if (selectedCertificate!= null) {
+                if (selectedCertificate != null) {
                     try {
                         DB db = DB.getBase();
                         boolean isInactive = db.checkStateByIdCertificate(selectedCertificate.getId()).equals("disactive");
@@ -167,6 +161,8 @@ public class MainAdminCertificatesController {
                     }
                 }
                 contextMenu.show(tableViewCertificates, event.getScreenX(), event.getScreenY());
+            } else if (event.getButton() == MouseButton.PRIMARY) {
+                contextMenu.hide(); // Скрываем контекстное меню при клике левой кнопкой мыши
             }
         });
     }

@@ -47,7 +47,7 @@ public class ReservationForAbonementController {
         DB db = DB.getBase();
 
         // Получаем список доступных абонементов из базы данных
-        for (Abonement abonement : db.getAbonements()) {
+        for (Abonement abonement : db.getActiveAbonements()) { // Изменение в методе получения абонементов
             // Добавляем идентификатор абонемента в комбобокс
             if (abonement.getBalance() > 0) {
                 comboboxIdAbonement.getItems().add(abonement.getId());

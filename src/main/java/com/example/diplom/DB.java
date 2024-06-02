@@ -706,4 +706,77 @@ public class DB {
         }
         return false;
     }
+
+    public List<Abonement> getActiveAbonements() {
+        List<Abonement> activeAbonements = new ArrayList<>();
+        String sql = "SELECT ab.*, st.название AS статус " +
+                "FROM `Абонементы` ab " +
+                "INNER JOIN `Статусы` st ON ab.id_статуса = st.id_статуса " +
+                "WHERE ab.архив = 'не в архиве' AND ab.состояние = 'active'";
+        try (Connection connection = getDbConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                // Создаем объект абонемента и заполняем его данными из результата запроса
+                Abonement abonement = new Abonement();
+                abonement.setId(resultSet.getInt("id_абонемента"));
+                abonement.setNominal(resultSet.getInt("номинал_в_минутах"));
+                abonement.setDateOfUse(resultSet.getDate("дата_использования"));
+                abonement.setBalance(resultSet.getInt("остаток_в_минутах"));
+                abonement.setDateOfBuy(resultSet.getDate("дата_покупки"));
+                abonement.setDateOfEnd(resultSet.getDate("дата_истечения"));
+                abonement.setDateOfRes(resultSet.getDate("дата_продления"));
+                abonement.setStatus(resultSet.getString("статус"));
+                abonement.setIdClient(resultSet.getInt("id_клиента"));
+                activeAbonements.add(abonement);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return activeAbonements;
+    }
+
+    public List<Certificate> getActiveCertificates() {
+        List<Certificate> activeCertificates = new ArrayList<>();
+        String sql = "SELECT ser.*, st.название AS статус " +
+                "FROM `Сертификаты` ser " +
+                "INNER JOIN `Статусы` st ON ser.id_статуса = st.id_статуса " +
+                "WHERE ser.архив = 'не в архиве' AND ser.состояние = 'active'";
+        try (Connection connection = getDbConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                // Создаем объект сертификата и заполняем его данными из результата запроса
+                Certificate certificate = new Certificate();
+                certificate.setId(resultSet.getInt("id_сертификата"));
+                certificate.setNominal(resultSet.getInt("номинал_в_минутах"));
+                certificate.setDateOfUse(resultSet.getDate("дата_использования"));
+                certificate.setBalance(resultSet.getInt("остаток_в_минутах"));
+                certificate.setDateOfBuy(resultSet.getDate("дата_покупки"));
+                certificate.setDateOfEnd(resultSet.getDate("дата_истечения"));
+                certificate.setStatus(resultSet.getString("статус"));
+                certificate.setIdClient(resultSet.getInt("id_клиента"));
+                activeCertificates.add(certificate);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return activeCertificates;
+    }
+
+    public boolean extendAbonement(int abonementId, int days) {
+        String sql = "UPDATE `Абонементы` SET `дата_истечения` = DATE_ADD(`дата_истечения`, INTERVAL ? DAY), `состояние` = 'active' WHERE `id_абонемента` = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, days);
+            statement.setInt(2, abonementId);
+            int rowsUpdated = statement.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+
 }
