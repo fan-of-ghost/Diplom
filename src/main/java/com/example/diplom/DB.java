@@ -511,6 +511,24 @@ public class DB {
         }
     }
 
+    public void addNewAbonementRace(LocalDate date, int spentTime, int idAbonement) {
+        String sql = "INSERT INTO `График_абонементов` (дата_использования, затраченное_время_в_минутах, id_абонемента) VALUES (?, ?, ?)";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setDate(1, Date.valueOf(date));
+            statement.setInt(2, spentTime);
+            statement.setInt(3, idAbonement);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Ошибка при добавлении нового заезда в график абонементов в базу данных", e);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Ошибка при подключении к базе данных", e);
+        }
+    }
+
+
     public void addNewCertificateRace(int id, LocalDate date, int spentTime, int idCertificate) {
         String sql = "INSERT INTO `График_сертификатов` (id_графика, дата_использования, затраченное_время_в_минутах, id_сертификата) VALUES (?, ?, ?, ?)";
         try (Connection connection = getDbConnection();
@@ -778,5 +796,34 @@ public class DB {
         return false;
     }
 
+    public int getNominalAbonement(int id) {
+        String sql = "SELECT номинал_в_минутах FROM Абонементы WHERE id_абонемента = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("номинал_в_минутах");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0; // Если не найдено, возвращаем 0 или обрабатываем по-другому
+    }
+
+    public LocalDate getExpirationDateAbonement(int id) {
+        String sql = "SELECT дата_истечения FROM Абонементы WHERE id_абонемента = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getDate("дата_истечения").toLocalDate();
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null; // Если не найдено, возвращаем null или обрабатываем по-другому
+    }
 
 }

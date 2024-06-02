@@ -1,40 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-
-<AnchorPane prefHeight="280.0" prefWidth="298.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.diplom.Controllers.ClientInfoAbonementsController">
+<AnchorPane prefHeight="180.0" prefWidth="354.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.diplom.Controllers.ClientInfoAbonementsController">
    <children>
-      <Text layoutX="32.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Клиент">
-         <font>
-            <Font size="20.0" />
-         </font>
-      </Text>
-      <Text layoutX="39.0" layoutY="90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Номер">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Text>
-      <Text layoutX="32.0" layoutY="218.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Адрес эл. почты">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Text>
-      <Text fx:id="numberField" layoutX="32.0" layoutY="110.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250.5421600341797" />
-      <Text layoutX="39.0" layoutY="133.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ФИО">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Text>
-      <Text fx:id="fioField" layoutX="32.0" layoutY="153.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250.5421600341797" />
-      <Text layoutX="34.0" layoutY="176.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Номер телефона">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Text>
-      <Text fx:id="contactNumberField" layoutX="32.0" layoutY="197.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250.5421600341797" />
-      <Text fx:id="mailField" layoutX="32.0" layoutY="238.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="250.5421600341797" />
+      <VBox layoutX="20.0" layoutY="10.0" prefHeight="165.0" prefWidth="334.0" spacing="10.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Клиент">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Text>
+            <HBox spacing="10.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Номер">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="numberField" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="200.0" />
+               </children>
+            </HBox>
+            <HBox spacing="10.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="ФИО">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="fioField" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="200.0" />
+               </children>
+            </HBox>
+            <HBox spacing="10.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Номер телефона">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="contactNumberField" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="200.0" />
+               </children>
+            </HBox>
+            <HBox spacing="10.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Адрес эл. почты">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="mailField" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="200.0" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
    </children>
 </AnchorPane>

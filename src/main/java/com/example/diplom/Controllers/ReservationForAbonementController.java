@@ -17,8 +17,11 @@ public class ReservationForAbonementController {
     @FXML
     private DatePicker dateOfReservation;
 
+    private LocalDate maxDate;
+
     @FXML
     void initialize() {
+        dateOfReservation.setDisable(true);
         disablePastAndCurrentDates();
         insertIdAndBalance();
     }
@@ -30,7 +33,7 @@ public class ReservationForAbonementController {
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 LocalDate today = LocalDate.now();
-                if (date.isBefore(today) || date.isEqual(today)) {
+                if (date.isBefore(today) || date.isEqual(today) || (maxDate != null && date.isAfter(maxDate))) {
                     setDisable(true);
                     setStyle("-fx-background-color: #ffc0cb;"); // Цвет ячейки для прошедших или текущих дат
                 }
@@ -59,8 +62,16 @@ public class ReservationForAbonementController {
             // Получаем выбранный абонемент из комбобокса
             Integer selectedAbonementId = comboboxIdAbonement.getValue();
             if (selectedAbonementId != null) {
-                // Получаем баланс выбранного абонемента из базы данных
+                // Получаем баланс и дату истечения выбранного абонемента из базы данных
                 int abonementBalance = db.getBalanceAbonement(selectedAbonementId);
+                LocalDate expirationDate = db.getExpirationDateAbonement(selectedAbonementId);
+
+                // Устанавливаем максимальную дату для бронирования
+                maxDate = expirationDate;
+
+                // Включаем DatePicker и обновляем DayCellFactory
+                dateOfReservation.setDisable(false);
+                disablePastAndCurrentDates();
 
                 // Устанавливаем баланс абонемента как максимальное значение для спиннера
                 spinnerMinutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, abonementBalance, 0));
@@ -95,14 +106,20 @@ public class ReservationForAbonementController {
         DB db = DB.getBase();
 
         try {
-            // Вставляем данные в таблицу График_абонементов
-            db.insertReservationAbonement(selectedAbonementId, reservationDate);
-
             // Обновляем данные в таблице Абонементы
             db.updateAbonement(selectedAbonementId, minutesToUse);
 
+            // Записываем затраченное время в График_абонементов
+            db.addNewAbonementRace(reservationDate, minutesToUse, selectedAbonementId);
+
             // Показать сообщение об успешном бронировании
             CreateAlert.showAlert(Alert.AlertType.INFORMATION, "Успешное бронирование", "Бронирование прошло успешно", "Ваше бронирование на " + reservationDate + " успешно выполнено.");
+
+            // Очищаем поля после успешного бронирования
+            comboboxIdAbonement.setValue(null);
+            spinnerMinutes.getValueFactory().setValue(0);
+            dateOfReservation.setValue(null);
+            dateOfReservation.setDisable(true);
 
         } catch (SQLException e) {
             e.printStackTrace();

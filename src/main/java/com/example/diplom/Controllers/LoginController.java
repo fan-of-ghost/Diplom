@@ -51,9 +51,9 @@ public class LoginController {
 
                 int role = db.checkRole(log, pass);
                 if (role == 1) {
-                    WindowsActions.changeWindow(event, "Список заказов гл админа", "mainAdminMenu.fxml");
+                    WindowsActions.changeWindow(event, "Меню главного админа", "mainAdminMenu.fxml");
                 } else if (role == 2) {
-                    WindowsActions.changeWindow(event, "Список заказов админа", "nonMainAdminMenu.fxml");
+                    WindowsActions.changeWindow(event, "Меню админа", "nonMainAdminMenu.fxml");
                 } else {
                     CreateAlert.showAlert(Alert.AlertType.ERROR, "Авторизация", "Ошибка", "Неверный логин или пароль");
                 }

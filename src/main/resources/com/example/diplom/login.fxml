@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="215.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.diplom.Controllers.LoginController">
-    <Label layoutX="66.0" layoutY="14.0" text="Авторизация">
-      <font>
-         <Font size="28.0" />
-      </font></Label>
-    <Label layoutX="124.0" layoutY="66.0" text="Логин" />
-    <Label layoutX="120.0" layoutY="115.0" text="Пароль" />
-    <TextField fx:id="login" layoutX="67.0" layoutY="83.0" promptText="Логин" />
-    <PasswordField fx:id="password" layoutX="67.0" layoutY="132.0" promptText="Пароль" />
-    <Button layoutX="116.0" layoutY="172.0" mnemonicParsing="false" onAction="#enter_button_click" text="Войти" />
-    <Label fx:id="viewPass" layoutX="222.0" layoutY="136.0" onMouseClicked="#view_pass_click" text="👁" />
-    <TextField fx:id="passwordText" layoutX="67.0" layoutY="132.0" promptText="Пароль" visible="false" />
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="171.0" prefWidth="270.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.diplom.Controllers.LoginController">
+    <Label layoutX="108.0" layoutY="20.0" text="Логин" />
+    <Label layoutX="104.0" layoutY="69.0" text="Пароль" />
+    <TextField fx:id="login" layoutX="51.0" layoutY="37.0" promptText="Логин" />
+    <PasswordField fx:id="password" layoutX="51.0" layoutY="86.0" promptText="Пароль" />
+    <Button layoutX="100.0" layoutY="126.0" mnemonicParsing="false" onAction="#enter_button_click" text="Войти" />
+    <Label fx:id="viewPass" layoutX="206.0" layoutY="90.0" onMouseClicked="#view_pass_click" text="👁" />
+    <TextField fx:id="passwordText" layoutX="51.0" layoutY="86.0" promptText="Пароль" visible="false" />
 </AnchorPane>

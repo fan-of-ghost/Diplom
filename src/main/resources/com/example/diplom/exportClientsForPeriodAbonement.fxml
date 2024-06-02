@@ -10,11 +10,6 @@
 
 <AnchorPane prefHeight="237.0" prefWidth="323.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.diplom.Controllers.ExportClientsForPeriodAbonement">
     <children>
-        <Text layoutX="21.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Экспорт сотрудников за период">
-            <font>
-                <Font size="19.0" />
-            </font>
-        </Text>
         <Text layoutX="111.0" layoutY="178.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Экспортировать в:" />
         <HBox layoutX="27.0" layoutY="55.0" prefHeight="55.0" prefWidth="280.0">
             <children>
@@ -44,6 +39,6 @@
                 </DatePicker>
             </children>
         </HBox>
-        <Button fx:id="exportToCSVButton" onAction="#exportToCSV" layoutX="143.0" layoutY="197.0" mnemonicParsing="false" text=".csv" />
+        <Button fx:id="exportToCSVButton" layoutX="143.0" layoutY="197.0" mnemonicParsing="false" onAction="#exportToCSV" text=".csv" />
     </children>
 </AnchorPane>

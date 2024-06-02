@@ -101,12 +101,12 @@ public class ScheduleAbonementsController {
             }
         });
 
-        item2.setOnAction(event -> {
-            System.out.println("Option 2 selected for date: " + selectedDate);
-            // Add your action here
-        });
+//        item2.setOnAction(event -> {
+//            System.out.println("Option 2 selected for date: " + selectedDate);
+//            // Add your action here
+//        });
 
-        contextMenu.getItems().addAll(item1, item2);
+        contextMenu.getItems().addAll(item1);
     }
 
 
