@@ -15,12 +15,12 @@ public class MainAdminMenuController {
 
     @FXML
     void moveToAbonements(ActionEvent event) throws IOException {
-        WindowsActions.changeWindow(event,"Абонементы","mainAdminAbonements.fxml");
+        WindowsActions.changeWindow(event,"Абонементы (гл. администратор)","mainAdminAbonements.fxml");
     }
 
     @FXML
     void moveToCertificates(ActionEvent event) throws IOException {
-        WindowsActions.changeWindow(event,"Сертификаты","mainAdminCertificates.fxml");
+        WindowsActions.changeWindow(event,"Сертификаты (гл. администратор)","mainAdminCertificates.fxml");
     }
 
     public void toLogOut(ActionEvent actionEvent) throws IOException {

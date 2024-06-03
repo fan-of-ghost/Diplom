@@ -18,7 +18,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
-public class MainAdminCertificatesController {
+public class NonMainAdminCertificatesController {
     @FXML
     private TableColumn<Certificate, Date> dateOfEndCertificate;
     @FXML
@@ -49,61 +49,6 @@ public class MainAdminCertificatesController {
         WindowsActions.openModalWindow("Новый сертификат", "certificateForm.fxml");
         // Загружаем абонементы для обновления
         loadCertificates();
-    }
-
-    public void onSaveToFileClick() {
-        // Получаем путь к папке "Загрузки" для текущего пользователя
-        String downloadsPath = System.getProperty("user.home") + "/Downloads/";
-        String baseFileName = "certificates";
-        String fileExtension = ".csv";
-
-        // Генерируем имя файла с порядковым номером
-        String fileName = generateUniqueFileName(downloadsPath, baseFileName, fileExtension);
-
-        try (PrintWriter writer = new PrintWriter(new File(downloadsPath + fileName))) {
-            // Записываем заголовки столбцов
-            writer.println("ID,Номинал,Дата использования,Остаток,Дата покупки,Дата истечения,Статус,Номер клиента");
-
-            // Получаем данные из TableView
-            ObservableList<Certificate> data = tableViewCertificates.getItems();
-
-            // Проходим по каждому сертификату и записываем его данные в CSV
-            for (Certificate certificate : data) {
-                writer.println(certificate.getId() + "," +
-                        certificate.getNominal() + "," +
-                        certificate.getDateOfUse() + "," +
-                        certificate.getBalance() + "," +
-                        certificate.getDateOfBuy() + "," +
-                        certificate.getDateOfEnd() + "," +
-                        getStatusIdByName(certificate.getStatus()) + "," +
-                        certificate.getIdClient());
-            }
-
-            System.out.println("Данные успешно сохранены в файл " + fileName + " в папке \"Загрузки\"");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Ошибка при сохранении данных в файл");
-        }
-    }
-
-    private String generateUniqueFileName(String directory, String baseName, String extension) {
-        int counter = 1;
-        String fileName = baseName + extension;
-        File file = new File(directory + fileName);
-
-        while (file.exists()) {
-            fileName = baseName + "_" + counter + extension;
-            file = new File(directory + fileName);
-            counter++;
-        }
-
-        return fileName;
-    }
-
-    private int getStatusIdByName(String statusName) {
-        // Здесь можно реализовать логику для получения ID статуса по его названию
-        DB db = DB.getBase();
-        return db.getStatusIdByName(statusName);
     }
 
     private void setupColorForDateOfEnd() {
@@ -218,16 +163,8 @@ public class MainAdminCertificatesController {
         });
     }
 
-    public void onLoadToFileClick() throws IOException {
-        WindowsActions.openModalWindow("Импорт таблиц из csv", "importTables.fxml");
-    }
-
     public void openModalWindowArchiveToCertificates() throws IOException {
         WindowsActions.openModalWindow("Архив просроченных сертификатов", "archiveToCertificates.fxml");
-    }
-
-    public void clientForPeriod() throws IOException {
-        WindowsActions.openModalWindow("Сотрудники за период", "exportClientsForPeriodCertificate.fxml");
     }
 
     public void openReservation() throws IOException {
@@ -235,7 +172,7 @@ public class MainAdminCertificatesController {
     }
 
     public void loadAbonements(ActionEvent actionEvent) throws IOException {
-        WindowsActions.changeWindow(actionEvent,"Абонементы (гл. администратор)","mainAdminAbonements.fxml");
+        WindowsActions.changeWindow(actionEvent,"Абонементы (администратор)","mainAdminAbonements.fxml");
     }
 
     public void toLogOut(ActionEvent actionEvent) throws IOException {

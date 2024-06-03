@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
-public class MainAdminAbonementsController {
+public class NonMainAdminAbonementsController {
     @FXML
     private TableView<Abonement> tableViewAbonements;
     @FXML
@@ -54,101 +54,47 @@ public class MainAdminAbonementsController {
         loadAbonements();
     }
 
-    public void onSaveToFileClick() {
-        String downloadsPath = System.getProperty("user.home") + "/Downloads/";
-        String baseFileName = "abonements";
-        String fileExtension = ".csv";
-
-        String fileName = generateUniqueFileName(downloadsPath, baseFileName, fileExtension);
-
-        try (PrintWriter writer = new PrintWriter(new File(downloadsPath + fileName))) {
-            writer.println("ID,Номинал,Дата использования,Остаток,Дата покупки,Дата истечения,Дата продления,ID Статуса,Номер клиента");
-
-            ObservableList<Abonement> data = tableViewAbonements.getItems();
-
-            for (Abonement abonement : data) {
-                writer.println(abonement.getId() + "," +
-                        abonement.getNominal() + "," +
-                        abonement.getDateOfUse() + "," +
-                        abonement.getBalance() + "," +
-                        abonement.getDateOfBuy() + "," +
-                        abonement.getDateOfEnd() + "," +
-                        abonement.getDateOfRes() + "," +
-                        getStatusIdByName(abonement.getStatus()) + "," +
-                        abonement.getIdClient());
-            }
-
-            System.out.println("Данные успешно сохранены в файл " + fileName + " в папке \"Загрузки\"");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Ошибка при сохранении данных в файл");
-        }
-    }
-
-    private String generateUniqueFileName(String directory, String baseName, String extension) {
-        int counter = 1;
-        String fileName = baseName + extension;
-        File file = new File(directory + fileName);
-
-        while (file.exists()) {
-            fileName = baseName + "_" + counter + extension;
-            file = new File(directory + fileName);
-            counter++;
-        }
-
-        return fileName;
-    }
-
-    private int getStatusIdByName(String statusName) {
-        DB db = DB.getBase();
-        return db.getStatusIdByName(statusName);
-    }
-
     private void setupColorForDateOfEnd() {
-        dateOfEndAbonement.setCellFactory(column -> {
-            return new TableCell<Abonement, Date>() {
-                @Override
-                protected void updateItem(Date item, boolean empty) {
-                    super.updateItem(item, empty);
+        dateOfEndAbonement.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Date item, boolean empty) {
+                super.updateItem(item, empty);
 
-                    if (empty || item == null) {
-                        setText(null);
-                        setGraphic(null);
-                        setStyle("");
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("");
+                } else {
+                    setText(item.toString());
+                    if (item.toLocalDate().isBefore(LocalDate.now())) {
+                        setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
                     } else {
-                        setText(item.toString());
-                        if (item.toLocalDate().isBefore(LocalDate.now())) {
-                            setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
-                        } else {
-                            setStyle("-fx-alignment: center;");
-                        }
+                        setStyle("-fx-alignment: center;");
                     }
                 }
-            };
+            }
         });
     }
 
     private void setupColorForBalance() {
-        balanceAbonement.setCellFactory(column -> {
-            return new TableCell<Abonement, Integer>() {
-                @Override
-                protected void updateItem(Integer item, boolean empty) {
-                    super.updateItem(item, empty);
+        balanceAbonement.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
 
-                    if (empty || item == null) {
-                        setText(null);
-                        setGraphic(null);
-                        setStyle("");
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("");
+                } else {
+                    setText(item.toString());
+                    if (item == 0) {
+                        setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
                     } else {
-                        setText(item.toString());
-                        if (item == 0) {
-                            setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
-                        } else {
-                            setStyle("-fx-alignment: center;");
-                        }
+                        setStyle("-fx-alignment: center;");
                     }
                 }
-            };
+            }
         });
     }
 
@@ -238,16 +184,8 @@ public class MainAdminAbonementsController {
         });
     }
 
-    public void onLoadToFileClick() throws IOException {
-        WindowsActions.openModalWindow("Импорт таблиц из csv", "importTables.fxml");
-    }
-
     public void openModalWindowArchiveToAbonements() throws IOException {
         WindowsActions.openModalWindow("Архив просроченных абонементов", "archiveToAbonements.fxml");
-    }
-
-    public void clientForPeriod() throws IOException {
-        WindowsActions.openModalWindow("Сотрудники за период", "exportClientsForPeriodAbonement.fxml");
     }
 
     public void openReservation() throws IOException {
@@ -263,7 +201,7 @@ public class MainAdminAbonementsController {
     }
 
     public void loadCertificates(ActionEvent actionEvent) throws IOException {
-        WindowsActions.changeWindow(actionEvent,"Сертификаты (гл. администратор)","mainAdminCertificates.fxml");
+        WindowsActions.changeWindow(actionEvent,"Сертификаты (администратор)","mainAdminCertificates.fxml");
     }
 
     public void toLogOut(ActionEvent actionEvent) throws IOException {
