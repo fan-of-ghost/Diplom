@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.MenuItem;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -18,13 +19,13 @@ public class WindowsActions {
     //width - ширина в пикселях
     //height - высота в пикселях
     public static void changeWindow(ActionEvent event, String title, String pageName, int width, int height) throws IOException {
-        openWindow(title,pageName,width,height);
+        openWindow(title, pageName, width, height);
         closeWindow(event);
     }
 
     //та же функция, но без заданной ширины и высоты окна
     public static void changeWindow(ActionEvent event, String title, String pageName) throws IOException {
-        openWindow(title,pageName);
+        openWindow(title, pageName);
         closeWindow(event);
     }
 
@@ -33,7 +34,7 @@ public class WindowsActions {
     //pageName - fxml файл
     //width - ширина в пикселях
     //height - высота в пикселях
-    public static void openWindow (String title, String pageName, int width, int height) throws IOException {
+    public static void openWindow(String title, String pageName, int width, int height) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource(pageName));
         Scene scene = new Scene(fxmlLoader.load(), width, height);
         Stage stage = new Stage();
@@ -43,7 +44,7 @@ public class WindowsActions {
     }
 
     //та же функция, но без заданной ширины и высоты окна
-    public static void openWindow (String title, String pageName) throws IOException {
+    public static void openWindow(String title, String pageName) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource(pageName));
         Scene scene = new Scene(fxmlLoader.load());
         Stage stage = new Stage();
@@ -54,16 +55,20 @@ public class WindowsActions {
 
     //Закрытие текущего окна
     //event - event с кнопки
-    public static void closeWindow (ActionEvent event) {
-        //(Stage) - приводим результат ((Node) event.getSource()).getScene().getWindow() к классу Stage
-        //Node - максимально абстрактный класс графического элемента
-        //event - как Node, только для события при нажатии кнопки
-        //getSource() - получить объект, который инициировал данное событие (event)
-        //getScene() - получить сцену, на которой находится объект, полученный из getSource()
-        //getWindow() - получить окно, в котором находится сцена, полученная из getScene()
-        Stage currentStage = (Stage)((Node) event.getSource()).getScene().getWindow();
-        //Закрываем текущее окно
-        currentStage.close();
+    public static void closeWindow(ActionEvent event) {
+        Object source = event.getSource();
+        Stage stage = null;
+
+        if (source instanceof Node) {
+            stage = (Stage) ((Node) source).getScene().getWindow();
+        } else if (source instanceof MenuItem) {
+            MenuItem menuItem = (MenuItem) source;
+            stage = (Stage) menuItem.getParentPopup().getOwnerWindow();
+        }
+
+        if (stage != null) {
+            stage.close();
+        }
     }
 
     //Открытие модального окна

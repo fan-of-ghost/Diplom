@@ -239,4 +239,12 @@ public class MainAdminAbonementsController {
     public void extensionAbonement() throws IOException {
         WindowsActions.openModalWindow("Продление абонемента", "extensionAbonement.fxml");
     }
+
+    public void loadCertificates(ActionEvent actionEvent) throws IOException {
+        WindowsActions.changeWindow(actionEvent,"Сертификаты","mainAdminCertificates.fxml");
+    }
+
+    public void toLogOut(ActionEvent actionEvent) throws IOException {
+        WindowsActions.changeWindow(actionEvent,"Авторизация", "login.fxml");
+    }
 }

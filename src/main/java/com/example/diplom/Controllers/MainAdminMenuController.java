@@ -23,4 +23,7 @@ public class MainAdminMenuController {
         WindowsActions.changeWindow(event,"Сертификаты","mainAdminCertificates.fxml");
     }
 
+    public void toLogOut(ActionEvent actionEvent) throws IOException {
+        WindowsActions.changeWindow(actionEvent,"Авторизация", "login.fxml");
+    }
 }
