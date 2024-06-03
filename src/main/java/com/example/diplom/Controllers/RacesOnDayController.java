@@ -69,27 +69,38 @@ public class RacesOnDayController {
         cancelRaceItem.setOnAction(event -> {
             String selectedItem = racesListView.getSelectionModel().getSelectedItem();
             if (selectedItem != null) {
-                // Подтверждение отмены
-                Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
-                confirmationAlert.setTitle("Подтверждение отмены");
-                confirmationAlert.setHeaderText("Вы уверены, что хотите отменить этот заезд?");
-                confirmationAlert.setContentText(selectedItem);
+                try {
+                    // Используем регулярное выражение для извлечения данных
+                    Pattern pattern = Pattern.compile("ID: (\\d+) \\| Дата: ([^\\|]+) \\| Длительность: (\\d+) мин\\. \\| Клиент: [^\\|]+ \\| ID Абонемента: (\\d+)");
+                    Matcher matcher = pattern.matcher(selectedItem);
 
-                Optional<ButtonType> result = confirmationAlert.showAndWait();
-                if (result.isPresent() && result.get() == ButtonType.OK) {
-                    try {
-                        // Используем регулярное выражение для извлечения данных
-                        Pattern pattern = Pattern.compile("Race ID: (\\d+), Date: [^,]+, Duration: (\\d+) minutes, Client: [^,]+, Abonement ID: (\\d+)");
-                        Matcher matcher = pattern.matcher(selectedItem);
+                    if (!matcher.find()) {
+                        throw new IllegalArgumentException("Неверный формат строки: " + selectedItem);
+                    }
 
-                        if (!matcher.find()) {
-                            throw new IllegalArgumentException("Неверный формат строки: " + selectedItem);
-                        }
+                    int raceId = Integer.parseInt(matcher.group(1));
+                    LocalDate raceDate = LocalDate.parse(matcher.group(2));
+                    int spentTime = Integer.parseInt(matcher.group(3));
+                    int abonementId = Integer.parseInt(matcher.group(4));
 
-                        int raceId = Integer.parseInt(matcher.group(1));
-                        int spentTime = Integer.parseInt(matcher.group(2));
-                        int abonementId = Integer.parseInt(matcher.group(3));
+                    // Проверка, является ли дата прошедшей
+                    if (raceDate.isBefore(LocalDate.now())) {
+                        Alert warningAlert = new Alert(Alert.AlertType.WARNING);
+                        warningAlert.setTitle("Отмена невозможна");
+                        warningAlert.setHeaderText("Невозможно отменить заезд");
+                        warningAlert.setContentText("Вы не можете отменить заезд на прошедшую дату.");
+                        warningAlert.showAndWait();
+                        return;
+                    }
 
+                    // Подтверждение отмены
+                    Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirmationAlert.setTitle("Подтверждение отмены");
+                    confirmationAlert.setHeaderText("Вы уверены, что хотите отменить этот заезд?");
+                    confirmationAlert.setContentText(selectedItem);
+
+                    Optional<ButtonType> result = confirmationAlert.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.OK) {
                         DB db = DB.getBase();
                         Connection conn = db.getDbConnection();
 
@@ -110,10 +121,9 @@ public class RacesOnDayController {
 
                         // Удаляем элемент из ListView
                         racesListView.getItems().remove(selectedItem);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -126,4 +136,6 @@ public class RacesOnDayController {
             }
         });
     }
+
+
 }
