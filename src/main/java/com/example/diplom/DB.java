@@ -183,23 +183,18 @@ public class DB {
     }
 
     public void addAbonement(int nominal, int status, int idClient, Date dateOfBuy) {
-        String sql = "INSERT INTO `Абонементы` (номинал_в_минутах, дата_покупки, дата_истечения, остаток_в_минутах, id_статуса, id_клиента) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO `Абонементы` (номинал_в_минутах, дата_использования, остаток_в_минутах, дата_истечения, дата_покупки, id_статуса, id_клиента) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = getDbConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             // Установка параметров запроса
+            LocalDate today = LocalDate.now();
             statement.setInt(1, nominal);
-            statement.setDate(2, dateOfBuy);
-
-            // Расчет даты истечения: добавляем к дате покупки 1 год
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(dateOfBuy);
-            calendar.add(Calendar.YEAR, 1);
-            java.sql.Date dateOfEnd = new java.sql.Date(calendar.getTimeInMillis());
-
-            statement.setDate(3, dateOfEnd);
-            statement.setInt(4, nominal); // Номинал также используется для остатка
-            statement.setInt(5, status);
-            statement.setInt(6, idClient);
+            statement.setDate(2, Date.valueOf(today)); // Используем сегодняшнюю дату
+            statement.setInt(3, nominal); // Номинал также используется для остатка
+            statement.setDate(4, Date.valueOf(today.plusYears(1))); // Дата истечения - год от текущей даты
+            statement.setDate(5, dateOfBuy);
+            statement.setInt(6, status);
+            statement.setInt(7, idClient);
 
             // Выполнение запроса
             statement.executeUpdate();
@@ -207,6 +202,7 @@ public class DB {
             e.printStackTrace();
         }
     }
+
 
     public int getStatusIdByName(String statusName) {
         String sql = "SELECT id_статуса FROM Статусы WHERE название = ?";
@@ -295,23 +291,18 @@ public class DB {
     }
 
     public void addCertificate(int nominal, int status, int idClient, Date dateOfBuy) {
-        String sql = "INSERT INTO `Сертификаты` (номинал_в_минутах, дата_покупки, дата_истечения, остаток_в_минутах, id_статуса, id_клиента) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO `Сертификаты` (номинал_в_минутах, дата_использования, остаток_в_минутах, дата_истечения, дата_покупки, id_статуса, id_клиента) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = getDbConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             // Установка параметров запроса
+            LocalDate today = LocalDate.now();
             statement.setInt(1, nominal);
-            statement.setDate(2, dateOfBuy);
-
-            // Расчет даты истечения: добавляем к дате покупки 1 год
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(dateOfBuy);
-            calendar.add(Calendar.YEAR, 1);
-            java.sql.Date dateOfEnd = new java.sql.Date(calendar.getTimeInMillis());
-
-            statement.setDate(3, dateOfEnd);
-            statement.setInt(4, nominal); // Номинал также используется для остатка
-            statement.setInt(5, status);
-            statement.setInt(6, idClient);
+            statement.setDate(2, Date.valueOf(today)); // Используем сегодняшнюю дату
+            statement.setInt(3, nominal); // Номинал также используется для остатка
+            statement.setDate(4, Date.valueOf(today.plusYears(1))); // Дата истечения - год от текущей даты
+            statement.setDate(5, dateOfBuy);
+            statement.setInt(6, status);
+            statement.setInt(7, idClient);
 
             // Выполнение запроса
             statement.executeUpdate();
@@ -688,11 +679,12 @@ public class DB {
     }
 
     public void updateAbonement(int abonementId, int minutesUsed) throws SQLException {
-        String sql = "UPDATE Абонементы SET остаток_в_минутах = остаток_в_минутах - ? WHERE id_абонемента = ?";
+        String sql = "UPDATE Абонементы SET остаток_в_минутах = остаток_в_минутах - ?, дата_использования = ? WHERE id_абонемента = ?";
         try (Connection connection = getDbConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, minutesUsed);
-            statement.setInt(2, abonementId);
+            statement.setDate(2, java.sql.Date.valueOf(LocalDate.now())); // Обновление даты использования
+            statement.setInt(3, abonementId);
             statement.executeUpdate();
         } catch (ClassNotFoundException e) {
             throw new SQLException("MySQL JDBC Driver не найден", e);
@@ -700,11 +692,12 @@ public class DB {
     }
 
     public void updateCertificate(int certificateId, int minutesUsed) throws SQLException {
-        String sql = "UPDATE Сертификаты SET остаток_в_минутах = остаток_в_минутах - ? WHERE id_сертификата = ?";
+        String sql = "UPDATE Сертификаты SET остаток_в_минутах = остаток_в_минутах - ?, дата_использования = ? WHERE id_сертификата = ?";
         try (Connection connection = getDbConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, minutesUsed);
-            statement.setInt(2, certificateId);
+            statement.setDate(2, java.sql.Date.valueOf(LocalDate.now())); // Обновление даты использования
+            statement.setInt(3, certificateId);
             statement.executeUpdate();
         } catch (ClassNotFoundException e) {
             throw new SQLException("MySQL JDBC Driver не найден", e);
@@ -813,6 +806,21 @@ public class DB {
 
     public LocalDate getExpirationDateAbonement(int id) {
         String sql = "SELECT дата_истечения FROM Абонементы WHERE id_абонемента = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getDate("дата_истечения").toLocalDate();
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null; // Если не найдено, возвращаем null или обрабатываем по-другому
+    }
+
+    public LocalDate getExpirationDateCertificate(int id) {
+        String sql = "SELECT дата_истечения FROM Сертификаты WHERE id_сертификата = ?";
         try (Connection connection = getDbConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);

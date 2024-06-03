@@ -5,6 +5,7 @@ import com.example.diplom.Products.Certificate;
 import com.example.diplom.addLibraries.DataExchanger;
 import com.example.diplom.addLibraries.WindowsActions;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
@@ -51,8 +52,13 @@ public class MainAdminCertificatesController {
     public void onSaveToFileClick() {
         // Получаем путь к папке "Загрузки" для текущего пользователя
         String downloadsPath = System.getProperty("user.home") + "/Downloads/";
+        String baseFileName = "certificates";
+        String fileExtension = ".csv";
 
-        try (PrintWriter writer = new PrintWriter(new File(downloadsPath + "certificates.csv"))) {
+        // Генерируем имя файла с порядковым номером
+        String fileName = generateUniqueFileName(downloadsPath, baseFileName, fileExtension);
+
+        try (PrintWriter writer = new PrintWriter(new File(downloadsPath + fileName))) {
             // Записываем заголовки столбцов
             writer.println("ID,Номинал,Дата использования,Остаток,Дата покупки,Дата истечения,Статус,Номер клиента");
 
@@ -67,15 +73,35 @@ public class MainAdminCertificatesController {
                         certificate.getBalance() + "," +
                         certificate.getDateOfBuy() + "," +
                         certificate.getDateOfEnd() + "," +
-                        certificate.getStatus() + "," +
+                        getStatusIdByName(certificate.getStatus()) + "," +
                         certificate.getIdClient());
             }
 
-            System.out.println("Данные успешно сохранены в файл certificates.csv в папке \"Загрузки\"");
+            System.out.println("Данные успешно сохранены в файл " + fileName + " в папке \"Загрузки\"");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Ошибка при сохранении данных в файл");
         }
+    }
+
+    private String generateUniqueFileName(String directory, String baseName, String extension) {
+        int counter = 1;
+        String fileName = baseName + extension;
+        File file = new File(directory + fileName);
+
+        while (file.exists()) {
+            fileName = baseName + "_" + counter + extension;
+            file = new File(directory + fileName);
+            counter++;
+        }
+
+        return fileName;
+    }
+
+    private int getStatusIdByName(String statusName) {
+        // Здесь можно реализовать логику для получения ID статуса по его названию
+        DB db = DB.getBase();
+        return db.getStatusIdByName(statusName);
     }
 
     private void setupColorForDateOfEnd() {
@@ -180,6 +206,18 @@ public class MainAdminCertificatesController {
     }
 
     public void openReservation() throws IOException {
-        WindowsActions.openModalWindow("Бронирование заезда по абонементу", "reservationForCertificate.fxml");
+        WindowsActions.openModalWindow("Бронирование заезда по сертификату", "reservationForCertificate.fxml");
+    }
+
+    public void loadAbonements(ActionEvent actionEvent) throws IOException {
+        WindowsActions.changeWindow(actionEvent,"Абонементы","mainAdminAbonements.fxml");
+    }
+
+    public void toLogOut(ActionEvent actionEvent) throws IOException {
+        WindowsActions.changeWindow(actionEvent,"Авторизация", "login.fxml");
+    }
+
+    public void openSchedule() throws IOException {
+        WindowsActions.openModalWindow("Расписание сертификатов", "scheduleCertificates.fxml");
     }
 }

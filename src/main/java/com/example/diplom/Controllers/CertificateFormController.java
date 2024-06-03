@@ -26,6 +26,15 @@ public class CertificateFormController {
     void initialize() {
         insertStatus();
         insertClient();
+        setupDatePicker();
+    }
+
+    private void setupDatePicker() {
+        LocalDate today = LocalDate.now();
+        datePickerOfBay.setValue(today);
+        datePickerOfBay.setEditable(false);  // Отключаем редактирование DatePicker
+        datePickerOfBay.getEditor().setDisable(true);  // Отключаем редактор DatePicker
+        datePickerOfBay.getEditor().setOpacity(1); // Делаем его видимым, если нужно
     }
 
     public void closeForm(ActionEvent actionEvent) {
@@ -92,7 +101,7 @@ public class CertificateFormController {
         int statusId = DB.getBase().getStatusIdByName(comboBoxIdStatus.getValue());
         int clientId = DB.getBase().getClientIdByEmail(comboBoxIdClient.getValue());
 
-        // Вставляем новый абонемент в базу данных
+        // Вставляем новый сертификат в базу данных
         DB.getBase().addCertificate(nominal, statusId, clientId, Date.valueOf(dateOfBuy));
 
         // Отображаем сообщение об успешном сохранении

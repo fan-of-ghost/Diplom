@@ -27,43 +27,53 @@
         <Label text="Номинал (мин)" GridPane.rowIndex="1">
             <GridPane.margin>
                 <Insets left="30.0" />
-            </GridPane.margin></Label>
+            </GridPane.margin>
+        </Label>
         <TextField fx:id="txtNominal" GridPane.columnIndex="1" GridPane.rowIndex="1">
             <GridPane.margin>
                 <Insets left="70.0" right="70.0" />
-            </GridPane.margin></TextField>
+            </GridPane.margin>
+        </TextField>
         <Label text="Дата покупки" GridPane.rowIndex="2">
             <GridPane.margin>
                 <Insets left="30.0" />
-            </GridPane.margin></Label>
+            </GridPane.margin>
+        </Label>
         <Label text="Статус" GridPane.rowIndex="3">
             <GridPane.margin>
                 <Insets left="30.0" />
-            </GridPane.margin></Label>
+            </GridPane.margin>
+        </Label>
         <Label text="Клиент" GridPane.rowIndex="4">
             <GridPane.margin>
                 <Insets left="30.0" />
-            </GridPane.margin></Label>
+            </GridPane.margin>
+        </Label>
         <Button fx:id="saveFormButton" mnemonicParsing="false" text="Сохранить" GridPane.halignment="LEFT" GridPane.rowIndex="5" onAction="#saveCertificate">
             <GridPane.margin>
                 <Insets left="30.0" />
-            </GridPane.margin></Button>
+            </GridPane.margin>
+        </Button>
         <Button fx:id="cancelFormButton" mnemonicParsing="false" onAction="#closeForm" text="Отмена" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
             <GridPane.margin>
                 <Insets right="80.0" />
-            </GridPane.margin></Button>
-        <DatePicker fx:id="datePickerOfBay" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            </GridPane.margin>
+        </Button>
+        <DatePicker fx:id="datePickerOfBay" GridPane.columnIndex="1" GridPane.rowIndex="2" editable="false" style="-fx-opacity: 0.5; -fx-focus-color: transparent; -fx-background-color: #E0E0E0;">
             <GridPane.margin>
                 <Insets left="30.0" />
-            </GridPane.margin></DatePicker>
+            </GridPane.margin>
+        </DatePicker>
         <ComboBox fx:id="comboBoxIdStatus" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
             <GridPane.margin>
                 <Insets left="40.0" />
-            </GridPane.margin></ComboBox>
+            </GridPane.margin>
+        </ComboBox>
         <ComboBox fx:id="comboBoxIdClient" prefHeight="26.0" prefWidth="130.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
             <GridPane.margin>
                 <Insets left="10.0" />
-            </GridPane.margin></ComboBox>
+            </GridPane.margin>
+        </ComboBox>
         <Button mnemonicParsing="false" text="Добавить" GridPane.columnIndex="1" GridPane.rowIndex="4" onAction="#addNewClient">
             <GridPane.margin>
                 <Insets left="150.0" />

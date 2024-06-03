@@ -26,6 +26,24 @@ public class AbonementFormController {
     void initialize() {
         insertStatus();
         insertClient();
+        setupDatePicker();
+    }
+
+    private void setupDatePicker() {
+        LocalDate today = LocalDate.now();
+        datePickerOfBay.setValue(today);
+        datePickerOfBay.setEditable(false);  // Отключаем редактирование DatePicker
+        datePickerOfBay.getEditor().setDisable(true);  // Отключаем редактор DatePicker
+        datePickerOfBay.getEditor().setOpacity(1); // Делаем его видимым, если нужно
+        datePickerOfBay.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (!date.equals(today)) {
+                    setDisable(true);
+                }
+            }
+        });
     }
 
     public void closeForm(ActionEvent actionEvent) {

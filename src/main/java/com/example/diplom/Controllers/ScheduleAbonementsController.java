@@ -95,7 +95,7 @@ public class ScheduleAbonementsController {
             System.out.println("Option 1 selected for date: " + selectedDate);
             DataExchanger.getInstance().setDate(selectedDate);
             try {
-                WindowsActions.openWindow("Заезды на " + selectedDate, "racesOnDay.fxml");
+                WindowsActions.openWindow("Заезды на " + selectedDate, "racesAbonementsOnDay.fxml");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

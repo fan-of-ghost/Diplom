@@ -110,7 +110,7 @@ public class ReservationForAbonementController {
             db.updateAbonement(selectedAbonementId, minutesToUse);
 
             // Записываем затраченное время в График_абонементов
-            db.addNewAbonementRace(reservationDate, minutesToUse, selectedAbonementId);
+            db.addNewAbonementRace(LocalDate.now(), minutesToUse, selectedAbonementId);
 
             // Показать сообщение об успешном бронировании
             CreateAlert.showAlert(Alert.AlertType.INFORMATION, "Успешное бронирование", "Бронирование прошло успешно", "Ваше бронирование на " + reservationDate + " успешно выполнено.");
@@ -126,4 +126,5 @@ public class ReservationForAbonementController {
             CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка базы данных", "Ошибка при выполнении запроса", "Произошла ошибка при бронировании. Попробуйте еще раз.");
         }
     }
+
 }

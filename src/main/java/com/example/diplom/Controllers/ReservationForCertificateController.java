@@ -17,8 +17,11 @@ public class ReservationForCertificateController {
     @FXML
     private DatePicker dateOfReservation;
 
+    private LocalDate maxDate;
+
     @FXML
     void initialize() {
+        dateOfReservation.setDisable(true);
         disablePastAndCurrentDates();
         insertIdAndBalance();
     }
@@ -30,7 +33,7 @@ public class ReservationForCertificateController {
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 LocalDate today = LocalDate.now();
-                if (date.isBefore(today) || date.isEqual(today)) {
+                if (date.isBefore(today) || date.isEqual(today) || (maxDate != null && date.isAfter(maxDate))) {
                     setDisable(true);
                     setStyle("-fx-background-color: #ffc0cb;"); // Цвет ячейки для прошедших или текущих дат
                 }
@@ -59,8 +62,16 @@ public class ReservationForCertificateController {
             // Получаем выбранный сертификат из комбобокса
             Integer selectedCertificateId = comboboxIdCertificate.getValue();
             if (selectedCertificateId != null) {
-                // Получаем баланс выбранного сертификата из базы данных
+                // Получаем баланс и дату истечения выбранного сертификата из базы данных
                 int certificateBalance = db.getBalanceCertificate(selectedCertificateId);
+                LocalDate expirationDate = db.getExpirationDateCertificate(selectedCertificateId);
+
+                // Устанавливаем максимальную дату для бронирования
+                maxDate = expirationDate;
+
+                // Включаем DatePicker и обновляем DayCellFactory
+                dateOfReservation.setDisable(false);
+                disablePastAndCurrentDates();
 
                 // Устанавливаем баланс сертификата как максимальное значение для спиннера
                 spinnerMinutes.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, certificateBalance, 0));
@@ -104,9 +115,18 @@ public class ReservationForCertificateController {
             // Показать сообщение об успешном бронировании
             CreateAlert.showAlert(Alert.AlertType.INFORMATION, "Успешное бронирование", "Бронирование прошло успешно", "Ваше бронирование на " + reservationDate + " успешно выполнено.");
 
+            // Установить текущую дату в dateOfReservation после сохранения
+            dateOfReservation.setValue(LocalDate.now());
+
+            // Очищаем поля после успешного бронирования
+            comboboxIdCertificate.setValue(null);
+            spinnerMinutes.getValueFactory().setValue(0);
+            dateOfReservation.setDisable(true);
+
         } catch (SQLException e) {
             e.printStackTrace();
             CreateAlert.showAlert(Alert.AlertType.ERROR, "Ошибка базы данных", "Ошибка при выполнении запроса", "Произошла ошибка при бронировании. Попробуйте еще раз.");
         }
     }
+
 }
