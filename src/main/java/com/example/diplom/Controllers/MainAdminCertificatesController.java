@@ -20,7 +20,9 @@ import java.util.List;
 
 public class MainAdminCertificatesController {
     @FXML
-    private TableColumn<Date, Date> dateOfEndCertificate;
+    private TableColumn<Certificate, Date> dateOfEndCertificate;
+    @FXML
+    private TableColumn<Certificate, Integer> balanceCertificate;
     @FXML
     private TableView<Certificate> tableViewCertificates;
 
@@ -105,32 +107,56 @@ public class MainAdminCertificatesController {
     }
 
     private void setupColorForDateOfEnd() {
-        dateOfEndCertificate.setCellFactory(column -> {
-            return new TableCell<Date, Date>() {
-                @Override
-                protected void updateItem(Date item, boolean empty) {
-                    super.updateItem(item, empty);
+        dateOfEndCertificate.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Date item, boolean empty) {
+                super.updateItem(item, empty);
 
-                    // Проверяем, пуста ли ячейка или равна ли ей null
-                    if (empty || item == null) {
-                        setText(null); // Очищаем текст ячейки
-                        setGraphic(null); // Очищаем графическое содержимое ячейки
-                        setStyle(""); // Сбрасываем стиль
+                // Проверяем, пуста ли ячейка или равна ли ей null
+                if (empty || item == null) {
+                    setText(null); // Очищаем текст ячейки
+                    setGraphic(null); // Очищаем графическое содержимое ячейки
+                    setStyle(""); // Сбрасываем стиль
+                } else {
+                    // Устанавливаем текст ячейки
+                    setText(item.toString());
+
+                    // Проверяем, что дата истечения меньше текущей даты
+                    if (item.toLocalDate().isBefore(LocalDate.now())) {
+                        // Если условие выполнено, устанавливаем красный цвет фона ячейки, белый цвет текста и выравнивание текста по центру
+                        setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
                     } else {
-                        // Устанавливаем текст ячейки
-                        setText(item.toString());
-
-                        // Проверяем, что дата продления меньше текущей даты
-                        if (item.toLocalDate().isBefore(LocalDate.now())) {
-                            // Если условие выполнено, устанавливаем красный цвет фона ячейки, белый цвет текста и выравнивание текста по центру
-                            setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
-                        } else {
-                            // Иначе используем стандартный стиль
-                            setStyle("-fx-alignment: center;");
-                        }
+                        // Иначе используем стандартный стиль
+                        setStyle("-fx-alignment: center;");
                     }
                 }
-            };
+            }
+        });
+
+        balanceCertificate.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+
+                // Проверяем, пуста ли ячейка или равна ли ей null
+                if (empty || item == null) {
+                    setText(null); // Очищаем текст ячейки
+                    setGraphic(null); // Очищаем графическое содержимое ячейки
+                    setStyle(""); // Сбрасываем стиль
+                } else {
+                    // Устанавливаем текст ячейки
+                    setText(item.toString());
+
+                    // Проверяем, что остаток равен нулю
+                    if (item == 0) {
+                        // Если условие выполнено, устанавливаем красный цвет фона ячейки, белый цвет текста и выравнивание текста по центру
+                        setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
+                    } else {
+                        // Иначе используем стандартный стиль
+                        setStyle("-fx-alignment: center;");
+                    }
+                }
+            }
         });
     }
 
@@ -140,7 +166,6 @@ public class MainAdminCertificatesController {
         MenuItem archiveMenuItem = new MenuItem("Архивировать сертификат");
 
         // Добавляем обработчики действий для каждого пункта меню
-
         editMenuItem.setOnAction(event -> {
             Certificate selectedCertificate = tableViewCertificates.getSelectionModel().getSelectedItem();
             if (selectedCertificate != null) {

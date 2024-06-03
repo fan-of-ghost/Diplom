@@ -25,12 +25,15 @@ public class MainAdminAbonementsController {
     @FXML
     private TableView<Abonement> tableViewAbonements;
     @FXML
-    private TableColumn<Date, Date> dateOfEndAbonement;
+    private TableColumn<Abonement, Date> dateOfEndAbonement;
+    @FXML
+    private TableColumn<Abonement, Integer> balanceAbonement; // Добавляем колонку для баланса абонемента
 
     @FXML
     void initialize() {
         loadAbonements();
         setupColorForDateOfEnd();
+        setupColorForBalance();
         setupContextMenu();
     }
 
@@ -48,27 +51,21 @@ public class MainAdminAbonementsController {
 
     public void onAddClick() throws IOException {
         WindowsActions.openModalWindow("Новый абонемент", "abonementForm.fxml");
-        // Загружаем абонементы для обновления
         loadAbonements();
     }
 
     public void onSaveToFileClick() {
-        // Получаем путь к папке "Загрузки" для текущего пользователя
         String downloadsPath = System.getProperty("user.home") + "/Downloads/";
         String baseFileName = "abonements";
         String fileExtension = ".csv";
 
-        // Генерируем имя файла с порядковым номером
         String fileName = generateUniqueFileName(downloadsPath, baseFileName, fileExtension);
 
         try (PrintWriter writer = new PrintWriter(new File(downloadsPath + fileName))) {
-            // Записываем заголовки столбцов
             writer.println("ID,Номинал,Дата использования,Остаток,Дата покупки,Дата истечения,Дата продления,ID Статуса,Номер клиента");
 
-            // Получаем данные из TableView
             ObservableList<Abonement> data = tableViewAbonements.getItems();
 
-            // Проходим по каждому абонементу и записываем его данные в CSV
             for (Abonement abonement : data) {
                 writer.println(abonement.getId() + "," +
                         abonement.getNominal() + "," +
@@ -103,35 +100,50 @@ public class MainAdminAbonementsController {
     }
 
     private int getStatusIdByName(String statusName) {
-        // Здесь можно реализовать логику для получения ID статуса по его названию
         DB db = DB.getBase();
         return db.getStatusIdByName(statusName);
     }
 
-
-
     private void setupColorForDateOfEnd() {
         dateOfEndAbonement.setCellFactory(column -> {
-            return new TableCell<Date, Date>() {
+            return new TableCell<Abonement, Date>() {
                 @Override
                 protected void updateItem(Date item, boolean empty) {
                     super.updateItem(item, empty);
 
-                    // Проверяем, пуста ли ячейка или равна ли ей null
                     if (empty || item == null) {
-                        setText(null); // Очищаем текст ячейки
-                        setGraphic(null); // Очищаем графическое содержимое ячейки
-                        setStyle(""); // Сбрасываем стиль
+                        setText(null);
+                        setGraphic(null);
+                        setStyle("");
                     } else {
-                        // Устанавливаем текст ячейки
                         setText(item.toString());
-
-                        // Проверяем, что дата продления меньше текущей даты
                         if (item.toLocalDate().isBefore(LocalDate.now())) {
-                            // Если условие выполнено, устанавливаем красный цвет фона ячейки, белый цвет текста и выравнивание текста по центру
                             setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
                         } else {
-                            // Иначе используем стандартный стиль
+                            setStyle("-fx-alignment: center;");
+                        }
+                    }
+                }
+            };
+        });
+    }
+
+    private void setupColorForBalance() {
+        balanceAbonement.setCellFactory(column -> {
+            return new TableCell<Abonement, Integer>() {
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null) {
+                        setText(null);
+                        setGraphic(null);
+                        setStyle("");
+                    } else {
+                        setText(item.toString());
+                        if (item == 0) {
+                            setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
+                        } else {
                             setStyle("-fx-alignment: center;");
                         }
                     }
@@ -144,9 +156,8 @@ public class MainAdminAbonementsController {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem editMenuItem = new MenuItem("Посмотреть клиента");
         MenuItem archiveMenuItem = new MenuItem("Архивировать абонемент");
-        MenuItem extendMenuItem = new MenuItem("Продлить на 1 год"); // Новый пункт меню для продления абонемента
-
-        // Добавляем обработчики действий для каждого пункта меню
+        MenuItem extendMenuItem = new MenuItem("Продлить на 1 год");
+        MenuItem sendToArchiveMenuItem = new MenuItem("Отправить в архив"); // Новый пункт меню
 
         editMenuItem.setOnAction(event -> {
             Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
@@ -181,40 +192,51 @@ public class MainAdminAbonementsController {
             if (selectedAbonement != null) {
                 try {
                     DB db = DB.getBase();
-                    db.extendAbonement(selectedAbonement.getId(), 365); // Продлеваем абонемент на 365 дней
+                    db.extendAbonement(selectedAbonement.getId(), 365);
                     System.out.println("Абонемент с id " + selectedAbonement.getId() + " продлен на 1 год");
-                    loadAbonements(); // Обновляем таблицу абонементов
+                    loadAbonements();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
         });
 
-        // Добавляем пункты меню
-        contextMenu.getItems().addAll(editMenuItem, archiveMenuItem, extendMenuItem);
+        sendToArchiveMenuItem.setOnAction(event -> {
+            Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
+            if (selectedAbonement != null) {
+                try {
+                    DB db = DB.getBase();
+                    db.archiveAbonement(selectedAbonement.getId());
+                    System.out.println("Абонемент с id " + selectedAbonement.getId() + " отправлен в архив");
+                    loadAbonements();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
-        // Устанавливаем обработчик для открытия контекстного меню
+        contextMenu.getItems().addAll(editMenuItem, archiveMenuItem, extendMenuItem, sendToArchiveMenuItem);
+
         tableViewAbonements.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (event.getButton() == MouseButton.SECONDARY) {
-                // Проверяем, удовлетворяет ли выбранный абонемент условию для отображения пункта "Архивировать абонемент"
                 Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
                 if (selectedAbonement != null) {
                     try {
                         DB db = DB.getBase();
                         boolean isInactive = db.checkStateByIdAbonement(selectedAbonement.getId()).equals("disactive");
-                        archiveMenuItem.setVisible(isInactive); // Устанавливаем видимость пункта меню в зависимости от результата проверки
-                        extendMenuItem.setVisible(isInactive); // Устанавливаем видимость пункта меню для продления абонемента
+                        archiveMenuItem.setVisible(isInactive);
+                        extendMenuItem.setVisible(isInactive);
+                        sendToArchiveMenuItem.setVisible(selectedAbonement.getBalance() == 0);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
                 contextMenu.show(tableViewAbonements, event.getScreenX(), event.getScreenY());
             } else if (event.getButton() == MouseButton.PRIMARY) {
-                contextMenu.hide(); // Скрываем контекстное меню при клике левой кнопкой мыши
+                contextMenu.hide();
             }
         });
     }
-
 
     public void onLoadToFileClick() throws IOException {
         WindowsActions.openModalWindow("Импорт таблиц из csv", "importTables.fxml");

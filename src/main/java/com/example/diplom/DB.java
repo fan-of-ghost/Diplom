@@ -538,6 +538,23 @@ public class DB {
         }
     }
 
+    public void addNewCertificateRace(LocalDate date, int spentTime, int idCertificate) {
+        String sql = "INSERT INTO `График_сертификатов` (дата_использования, затраченное_время_в_минутах, id_сертификата) VALUES (?, ?, ?)";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setDate(1, Date.valueOf(date));
+            statement.setInt(2, spentTime);
+            statement.setInt(3, idCertificate);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Ошибка при добавлении нового заезда в график сертификатов в базу данных", e);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Ошибка при подключении к базе данных", e);
+        }
+    }
+
     public String checkStateByIdAbonement(int id) {
         String sql = "SELECT `состояние` FROM `Абонементы` WHERE `id_абонемента` = ?";
         try (Connection connection = getDbConnection();
@@ -679,12 +696,12 @@ public class DB {
     }
 
     public void updateAbonement(int abonementId, int minutesUsed) throws SQLException {
-        String sql = "UPDATE Абонементы SET остаток_в_минутах = остаток_в_минутах - ?, дата_использования = ? WHERE id_абонемента = ?";
+        String sql = "{CALL update_abonement_balance(?, ?, ?)}";
         try (Connection connection = getDbConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, minutesUsed);
-            statement.setDate(2, java.sql.Date.valueOf(LocalDate.now())); // Обновление даты использования
-            statement.setInt(3, abonementId);
+             CallableStatement statement = connection.prepareCall(sql)) {
+            statement.setInt(1, abonementId);
+            statement.setInt(2, minutesUsed);
+            statement.setDate(3, java.sql.Date.valueOf(LocalDate.now())); // Use current date for useDate
             statement.executeUpdate();
         } catch (ClassNotFoundException e) {
             throw new SQLException("MySQL JDBC Driver не найден", e);
@@ -692,17 +709,18 @@ public class DB {
     }
 
     public void updateCertificate(int certificateId, int minutesUsed) throws SQLException {
-        String sql = "UPDATE Сертификаты SET остаток_в_минутах = остаток_в_минутах - ?, дата_использования = ? WHERE id_сертификата = ?";
+        String sql = "{CALL update_certificate_balance(?, ?, ?)}";
         try (Connection connection = getDbConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, minutesUsed);
-            statement.setDate(2, java.sql.Date.valueOf(LocalDate.now())); // Обновление даты использования
-            statement.setInt(3, certificateId);
+             CallableStatement statement = connection.prepareCall(sql)) {
+            statement.setInt(1, certificateId);
+            statement.setInt(2, minutesUsed);
+            statement.setDate(3, java.sql.Date.valueOf(LocalDate.now())); // Use current date
             statement.executeUpdate();
         } catch (ClassNotFoundException e) {
             throw new SQLException("MySQL JDBC Driver не найден", e);
         }
     }
+
 
     public boolean extensionAbonement(int abonementId, int additionalMinutes) {
         String sql = "UPDATE `Абонементы` SET `остаток_в_минутах` = `остаток_в_минутах` + ?, `дата_продления` = NOW() WHERE `id_абонемента` = ?";

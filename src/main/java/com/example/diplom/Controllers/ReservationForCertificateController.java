@@ -106,11 +106,11 @@ public class ReservationForCertificateController {
         DB db = DB.getBase();
 
         try {
-            // Вставляем данные в таблицу График_сертификатов
-            db.insertReservationCertificate(selectedCertificateId, reservationDate);
-
             // Обновляем данные в таблице Сертификаты
             db.updateCertificate(selectedCertificateId, minutesToUse);
+
+            // Вставляем данные в таблицу График_сертификатов
+            db.addNewCertificateRace(LocalDate.now(), minutesToUse, selectedCertificateId);
 
             // Показать сообщение об успешном бронировании
             CreateAlert.showAlert(Alert.AlertType.INFORMATION, "Успешное бронирование", "Бронирование прошло успешно", "Ваше бронирование на " + reservationDate + " успешно выполнено.");
