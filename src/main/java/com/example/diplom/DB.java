@@ -503,10 +503,10 @@ public class DB {
     }
 
     public void addNewAbonementRace(LocalDate date, int spentTime, int idAbonement) {
-        String sql = "INSERT INTO `График_абонементов` (дата_использования, затраченное_время_в_минутах, id_абонемента) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO График_абонементов (дата_использования, затраченное_время_в_минутах, id_абонемента) VALUES (?, ?, ?)";
         try (Connection connection = getDbConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setDate(1, Date.valueOf(date));
+            statement.setDate(1, Date.valueOf(date)); // Используем выбранную дату
             statement.setInt(2, spentTime);
             statement.setInt(3, idAbonement);
             statement.executeUpdate();
@@ -518,6 +518,7 @@ public class DB {
             throw new RuntimeException("Ошибка при подключении к базе данных", e);
         }
     }
+
 
 
     public void addNewCertificateRace(int id, LocalDate date, int spentTime, int idCertificate) {
@@ -539,10 +540,10 @@ public class DB {
     }
 
     public void addNewCertificateRace(LocalDate date, int spentTime, int idCertificate) {
-        String sql = "INSERT INTO `График_сертификатов` (дата_использования, затраченное_время_в_минутах, id_сертификата) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO График_сертификатов (дата_использования, затраченное_время_в_минутах, id_сертификата) VALUES (?, ?, ?)";
         try (Connection connection = getDbConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setDate(1, Date.valueOf(date));
+            statement.setDate(1, Date.valueOf(date)); // Используем выбранную дату
             statement.setInt(2, spentTime);
             statement.setInt(3, idCertificate);
             statement.executeUpdate();
@@ -554,6 +555,7 @@ public class DB {
             throw new RuntimeException("Ошибка при подключении к базе данных", e);
         }
     }
+
 
     public String checkStateByIdAbonement(int id) {
         String sql = "SELECT `состояние` FROM `Абонементы` WHERE `id_абонемента` = ?";
@@ -720,7 +722,6 @@ public class DB {
             throw new SQLException("MySQL JDBC Driver не найден", e);
         }
     }
-
 
     public boolean extensionAbonement(int abonementId, int additionalMinutes) {
         String sql = "UPDATE `Абонементы` SET `остаток_в_минутах` = `остаток_в_минутах` + ?, `дата_продления` = NOW() WHERE `id_абонемента` = ?";

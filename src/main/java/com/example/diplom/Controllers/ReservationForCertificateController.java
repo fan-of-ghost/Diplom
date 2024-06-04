@@ -110,7 +110,7 @@ public class ReservationForCertificateController {
             db.updateCertificate(selectedCertificateId, minutesToUse);
 
             // Вставляем данные в таблицу График_сертификатов
-            db.addNewCertificateRace(LocalDate.now(), minutesToUse, selectedCertificateId);
+            db.addNewCertificateRace(reservationDate, minutesToUse, selectedCertificateId);
 
             // Показать сообщение об успешном бронировании
             CreateAlert.showAlert(Alert.AlertType.INFORMATION, "Успешное бронирование", "Бронирование прошло успешно", "Ваше бронирование на " + reservationDate + " успешно выполнено.");
