@@ -167,17 +167,12 @@ public class NonMainAdminAbonementsController {
             if (event.getButton() == MouseButton.SECONDARY) {
                 Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
                 if (selectedAbonement != null) {
-                    try {
-                        DB db = DB.getBase();
-                        boolean isInactive = db.checkStateByIdAbonement(selectedAbonement.getId()).equals("disactive");
-                        archiveMenuItem.setVisible(isInactive);
-                        extendMenuItem.setVisible(isInactive);
-                        sendToArchiveMenuItem.setVisible(selectedAbonement.getBalance() == 0);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
+                    boolean isInactive = selectedAbonement.getBalance() == 0;
+                    archiveMenuItem.setVisible(isInactive);
+                    extendMenuItem.setVisible(!isInactive);
+                    sendToArchiveMenuItem.setVisible(selectedAbonement.getBalance() != 0);
+                    contextMenu.show(tableViewAbonements, event.getScreenX(), event.getScreenY());
                 }
-                contextMenu.show(tableViewAbonements, event.getScreenX(), event.getScreenY());
             } else if (event.getButton() == MouseButton.PRIMARY) {
                 contextMenu.hide();
             }

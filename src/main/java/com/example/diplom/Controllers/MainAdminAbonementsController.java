@@ -105,50 +105,46 @@ public class MainAdminAbonementsController {
     }
 
     private void setupColorForDateOfEnd() {
-        dateOfEndAbonement.setCellFactory(column -> {
-            return new TableCell<Abonement, Date>() {
-                @Override
-                protected void updateItem(Date item, boolean empty) {
-                    super.updateItem(item, empty);
+        dateOfEndAbonement.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Date item, boolean empty) {
+                super.updateItem(item, empty);
 
-                    if (empty || item == null) {
-                        setText(null);
-                        setGraphic(null);
-                        setStyle("");
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("");
+                } else {
+                    setText(item.toString());
+                    if (item.toLocalDate().isBefore(LocalDate.now())) {
+                        setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
                     } else {
-                        setText(item.toString());
-                        if (item.toLocalDate().isBefore(LocalDate.now())) {
-                            setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
-                        } else {
-                            setStyle("-fx-alignment: center;");
-                        }
+                        setStyle("-fx-alignment: center;");
                     }
                 }
-            };
+            }
         });
     }
 
     private void setupColorForBalance() {
-        balanceAbonement.setCellFactory(column -> {
-            return new TableCell<Abonement, Integer>() {
-                @Override
-                protected void updateItem(Integer item, boolean empty) {
-                    super.updateItem(item, empty);
+        balanceAbonement.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
 
-                    if (empty || item == null) {
-                        setText(null);
-                        setGraphic(null);
-                        setStyle("");
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("");
+                } else {
+                    setText(item.toString());
+                    if (item == 0) {
+                        setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
                     } else {
-                        setText(item.toString());
-                        if (item == 0) {
-                            setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-alignment: center;");
-                        } else {
-                            setStyle("-fx-alignment: center;");
-                        }
+                        setStyle("-fx-alignment: center;");
                     }
                 }
-            };
+            }
         });
     }
 
@@ -157,7 +153,7 @@ public class MainAdminAbonementsController {
         MenuItem editMenuItem = new MenuItem("Посмотреть клиента");
         MenuItem archiveMenuItem = new MenuItem("Архивировать абонемент");
         MenuItem extendMenuItem = new MenuItem("Продлить на 1 год");
-        MenuItem sendToArchiveMenuItem = new MenuItem("Отправить в архив"); // Новый пункт меню
+        MenuItem sendToArchiveMenuItem = new MenuItem("Отправить в архив");
 
         editMenuItem.setOnAction(event -> {
             Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
@@ -221,17 +217,12 @@ public class MainAdminAbonementsController {
             if (event.getButton() == MouseButton.SECONDARY) {
                 Abonement selectedAbonement = tableViewAbonements.getSelectionModel().getSelectedItem();
                 if (selectedAbonement != null) {
-                    try {
-                        DB db = DB.getBase();
-                        boolean isInactive = db.checkStateByIdAbonement(selectedAbonement.getId()).equals("disactive");
-                        archiveMenuItem.setVisible(isInactive);
-                        extendMenuItem.setVisible(isInactive);
-                        sendToArchiveMenuItem.setVisible(selectedAbonement.getBalance() == 0);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
+                    boolean isInactive = selectedAbonement.getBalance() == 0;
+                    archiveMenuItem.setVisible(isInactive);
+                    extendMenuItem.setVisible(!isInactive);
+                    sendToArchiveMenuItem.setVisible(selectedAbonement.getBalance() != 0);
+                    contextMenu.show(tableViewAbonements, event.getScreenX(), event.getScreenY());
                 }
-                contextMenu.show(tableViewAbonements, event.getScreenX(), event.getScreenY());
             } else if (event.getButton() == MouseButton.PRIMARY) {
                 contextMenu.hide();
             }
