@@ -852,4 +852,25 @@ public class DB {
         return null; // Если не найдено, возвращаем null или обрабатываем по-другому
     }
 
+    public boolean getStatusAbonementById(int id) {
+        String sql = "SELECT `состояние` FROM `Абонементы` WHERE `id_абонемента` = ?";
+        try (Connection connection = getDbConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                String status = resultSet.getString("состояние");
+                if ("active".equalsIgnoreCase(status)) {
+                    return true;
+                } else if ("disactive".equalsIgnoreCase(status)) {
+                    return false;
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return false; // Если не найдено или другое состояние
+    }
+
+
 }
