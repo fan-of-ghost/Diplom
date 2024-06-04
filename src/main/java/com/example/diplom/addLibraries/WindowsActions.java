@@ -6,10 +6,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class WindowsActions {
     // Метод перехода на другое окно
@@ -49,6 +51,9 @@ public class WindowsActions {
         Scene scene = new Scene(fxmlLoader.load(), width, height);
         Stage stage = new Stage();
         stage.setTitle(title);
+        // Установка иконки программы
+        Image icon = new Image(Objects.requireNonNull(HelloApplication.class.getResourceAsStream("/Images/carting-icon.png")));
+        stage.getIcons().add(icon);
         stage.setScene(scene);
         stage.setResizable(false); // Окно не изменяемо по размеру
         stage.show();
@@ -60,6 +65,9 @@ public class WindowsActions {
         Scene scene = new Scene(fxmlLoader.load());
         Stage stage = new Stage();
         stage.setTitle(title);
+        // Установка иконки программы
+        Image icon = new Image(Objects.requireNonNull(HelloApplication.class.getResourceAsStream("/Images/carting-icon.png")));
+        stage.getIcons().add(icon);
         stage.setScene(scene);
         stage.setResizable(false); // Окно не изменяемо по размеру
         stage.show();
@@ -93,6 +101,11 @@ public class WindowsActions {
         stage.initModality(Modality.APPLICATION_MODAL);
 
         stage.setTitle(title);
+
+        // Установка иконки программы
+        Image icon = new Image(Objects.requireNonNull(HelloApplication.class.getResourceAsStream("/Images/carting-icon.png")));
+        stage.getIcons().add(icon);
+
         stage.setScene(scene);
         stage.setResizable(false); // Окно не изменяемо по размеру
         stage.showAndWait();
@@ -107,6 +120,11 @@ public class WindowsActions {
         stage.initModality(Modality.APPLICATION_MODAL);
 
         stage.setTitle(title);
+
+        // Установка иконки программы
+        Image icon = new Image(Objects.requireNonNull(HelloApplication.class.getResourceAsStream("/Images/carting-icon.png")));
+        stage.getIcons().add(icon);
+
         stage.setScene(scene);
         stage.setResizable(false); // Окно не изменяемо по размеру
         stage.showAndWait();
