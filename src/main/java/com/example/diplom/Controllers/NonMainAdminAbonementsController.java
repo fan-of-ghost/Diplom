@@ -201,7 +201,7 @@ public class NonMainAdminAbonementsController {
     }
 
     public void loadCertificates(ActionEvent actionEvent) throws IOException {
-        WindowsActions.changeWindow(actionEvent,"Сертификаты (администратор)","mainAdminCertificates.fxml");
+        WindowsActions.changeWindow(actionEvent,"Сертификаты (администратор)","NonMainAdminCertificates.fxml");
     }
 
     public void toLogOut(ActionEvent actionEvent) throws IOException {
