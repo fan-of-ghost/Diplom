@@ -29,7 +29,7 @@ public class DB {
     private Connection dbConn = null;
 
     public Connection getDbConnection() throws ClassNotFoundException, SQLException {
-        String connStr = "jdbc:mysql://localhost" + ":" + PORT + "/" + DB_NAME;
+        String connStr = "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME;
         Class.forName("com.mysql.cj.jdbc.Driver");
         dbConn = DriverManager.getConnection(connStr, LOGIN, PASS);
         return dbConn;

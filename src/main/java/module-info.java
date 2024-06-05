@@ -3,7 +3,6 @@ module com.example.diplom {
     requires javafx.fxml;
     requires java.sql;
     requires mysql.connector.java;
-    requires com.fasterxml.jackson.databind;
     requires commons.csv;
     opens com.example.diplom.Products;
 
