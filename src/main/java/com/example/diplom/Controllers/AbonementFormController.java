@@ -27,6 +27,7 @@ public class AbonementFormController {
         insertStatus();
         insertClient();
         setupDatePicker();
+        setupNominalField();  // Добавляем настройку поля txtNominal
     }
 
     private void setupDatePicker() {
@@ -42,6 +43,23 @@ public class AbonementFormController {
                 if (!date.equals(today)) {
                     setDisable(true);
                 }
+            }
+        });
+    }
+
+    private void setupNominalField() {
+        txtNominal.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                txtNominal.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+
+            try {
+                int value = Integer.parseInt(newValue);
+                if (value > 1000) {
+                    txtNominal.setText("1000");
+                }
+            } catch (NumberFormatException e) {
+                // Если значение пустое или не является числом, просто игнорируем
             }
         });
     }

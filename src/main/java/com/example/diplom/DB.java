@@ -21,7 +21,7 @@ public class DB {
         return base;
     }
 
-    private final String HOST = "127.0.0.1";
+    private final String HOST = "localhost";
     private final String PORT = "3306";
     private final String DB_NAME = "Картинг";
     private final String LOGIN = "root";

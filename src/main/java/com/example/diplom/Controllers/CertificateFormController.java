@@ -27,6 +27,7 @@ public class CertificateFormController {
         insertStatus();
         insertClient();
         setupDatePicker();
+        setupNominalField();
     }
 
     private void setupDatePicker() {
@@ -35,6 +36,32 @@ public class CertificateFormController {
         datePickerOfBay.setEditable(false);  // Отключаем редактирование DatePicker
         datePickerOfBay.getEditor().setDisable(true);  // Отключаем редактор DatePicker
         datePickerOfBay.getEditor().setOpacity(1); // Делаем его видимым, если нужно
+        datePickerOfBay.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                if (!date.equals(today)) {
+                    setDisable(true);
+                }
+            }
+        });
+    }
+
+    private void setupNominalField() {
+        txtNominal.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                txtNominal.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+
+            try {
+                int value = Integer.parseInt(newValue);
+                if (value > 1000) {
+                    txtNominal.setText("1000");
+                }
+            } catch (NumberFormatException e) {
+                // Если значение пустое или не является числом, просто игнорируем
+            }
+        });
     }
 
     public void closeForm(ActionEvent actionEvent) {

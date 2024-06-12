@@ -44,6 +44,10 @@ public class ExtensionAbonementController {
     @FXML
     private void initialize() {
         abonementIdField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                abonementIdField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+
             if (!newValue.isEmpty()) {
                 try {
                     int id = Integer.parseInt(newValue);
